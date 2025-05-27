@@ -46,16 +46,10 @@ export function ExamSetupModal({
 
   useEffect(() => {
     if (isOpen) {
-      // When modal opens, sync formState with currentDetails
-      // If title is empty or doesn't match derived title, try to derive it
       let newTitle = currentDetails.title;
       const derived = deriveTitle(currentDetails.subject, currentDetails.paper);
       if (!newTitle && derived) {
         newTitle = derived;
-      } else if (newTitle && derived && newTitle !== derived && currentDetails.subject && currentDetails.paper) {
-        // If title exists but doesn't match a possible derivation, keep it for now
-        // unless subject/paper are clearly set, then re-derive.
-        // This handles cases where title might be set by a preset that's now removed.
       }
       
       setFormState({
@@ -83,6 +77,13 @@ export function ExamSetupModal({
       return updatedFormState;
     });
   }, []);
+
+  const adjustDuration = (amount: number) => {
+    setFormState(prev => ({
+      ...prev,
+      durationMinutes: Math.max(0, (prev.durationMinutes || 0) + amount)
+    }));
+  };
   
   const handleExamLanguageChange = (lang: 'en' | 'zh-hk') => {
     setFormState(prev => ({ ...prev, examLanguage: lang }));
@@ -91,7 +92,6 @@ export function ExamSetupModal({
   const handleSave = () => {
     let finalDetails = { ...formState };
     
-    // Derive title from subject and paper if not already set or if it needs updating
     finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper);
 
     if (!finalDetails.title.trim()) {
@@ -118,8 +118,8 @@ export function ExamSetupModal({
   const T = {
     modalTitle: language === 'zh-hk' ? '考試設定' : 'Exam Setup',
     centreInformationTitle: language === 'zh-hk' ? '中心資訊' : 'Centre Information',
-    centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
-    centreNumberLabel: language === 'zh-hk' ? '中心編號:' : 'Centre Number:',
+    centreNameLabel: language === 'zh-hk' ? '中心:' : 'Centre:', // Updated
+    centreNumberLabel: language === 'zh-hk' ? '考場:' : 'Venue:', // Updated (考場 also means exam venue, aligning with Centre Number's purpose)
     examDetailsTitle: language === 'zh-hk' ? '考試詳情' : 'Exam Details',
     subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
@@ -176,7 +176,23 @@ export function ExamSetupModal({
               <h3 className="text-lg font-semibold text-foreground">{T.timingTitle}</h3>
               <div>
                 <Label htmlFor="durationMinutes" className="text-foreground/90">{T.durationMinutesLabel}</Label>
-                <Input id="durationMinutes" name="durationMinutes" type="number" value={formState.durationMinutes} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border" min="0" />
+                <div className="flex items-center space-x-2 mt-1">
+                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => adjustDuration(-1)} aria-label={language === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
+                    <Icons.Minus className="h-4 w-4" />
+                  </Button>
+                  <Input 
+                    id="durationMinutes" 
+                    name="durationMinutes" 
+                    type="number" 
+                    value={formState.durationMinutes} 
+                    onChange={handleInputChange} 
+                    className="bg-input text-input-foreground border-border text-center flex-1 h-10" 
+                    min="0" 
+                  />
+                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => adjustDuration(1)} aria-label={language === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
+                    <Icons.Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <div>
                 <Label className="text-foreground/90">{T.examTimeLabel}</Label>
@@ -223,3 +239,5 @@ export function ExamSetupModal({
     </Dialog>
   );
 }
+
+    
