@@ -68,19 +68,24 @@ export default function Home() {
               <MainClock />
               <h1 className="text-xl font-semibold hidden sm:block">Exam Info Board</h1>
             </div>
-            <HeaderActions onOpenUserManual={() => setIsUserManualOpen(true)} />
+            <HeaderActions 
+              onOpenUserManual={() => setIsUserManualOpen(true)}
+              onOpenExamSetup={() => setIsExamSetupOpen(true)} 
+            />
           </div>
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-4xl p-4 md:p-6 lg:p-8">
+      <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8">
         <div className="grid grid-cols-1 gap-6">
-          <TimerCard onOpenConfirmation={handleOpenConfirmation} initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)} />
+          <TimerCard 
+            onOpenConfirmation={handleOpenConfirmation} 
+            initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)} 
+          />
           <ExamInfoCard examDetails={examDetails} />
           <SettingsCard
             fontScale={fontScale}
             onFontScaleChange={setFontScale}
-            onOpenExamSetup={() => setIsExamSetupOpen(true)}
           />
         </div>
       </main>

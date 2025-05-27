@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTheme } from "next-themes";
@@ -13,9 +14,10 @@ import React, { useState, useEffect } from "react";
 
 interface HeaderActionsProps {
   onOpenUserManual: () => void;
+  onOpenExamSetup: () => void;
 }
 
-export function HeaderActions({ onOpenUserManual }: HeaderActionsProps) {
+export function HeaderActions({ onOpenUserManual, onOpenExamSetup }: HeaderActionsProps) {
   const { setTheme, theme } = useTheme();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState("EN"); // Placeholder
@@ -92,6 +94,11 @@ export function HeaderActions({ onOpenUserManual }: HeaderActionsProps) {
       <Button variant="outline" size="icon" onClick={toggleFullScreen}>
         {isFullScreen ? <Icons.Shrink className="h-5 w-5" /> : <Icons.Expand className="h-5 w-5" />}
         <span className="sr-only">Toggle fullscreen</span>
+      </Button>
+
+      <Button variant="outline" size="icon" onClick={onOpenExamSetup}>
+        <Icons.Settings2 className="h-5 w-5" />
+        <span className="sr-only">Exam Setup</span>
       </Button>
 
       <Button variant="outline" size="icon" onClick={onOpenUserManual}>

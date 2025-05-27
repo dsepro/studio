@@ -2,7 +2,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Icons } from "@/components/icons";
 import React from "react";
@@ -10,10 +9,9 @@ import React from "react";
 interface SettingsCardProps {
   fontScale: number;
   onFontScaleChange: (scale: number) => void;
-  onOpenExamSetup: () => void;
 }
 
-export function SettingsCard({ fontScale, onFontScaleChange, onOpenExamSetup }: SettingsCardProps) {
+export function SettingsCard({ fontScale, onFontScaleChange }: SettingsCardProps) {
   const handleSliderChange = (value: number[]) => {
     onFontScaleChange(value[0]);
   };
@@ -40,11 +38,6 @@ export function SettingsCard({ fontScale, onFontScaleChange, onOpenExamSetup }: 
           </div>
           <p className="text-xs text-muted-foreground text-center mt-1">Current Scale: {fontScale.toFixed(2)}</p>
         </div>
-        
-        <Button onClick={onOpenExamSetup} className="w-full" variant="outline">
-          <Icons.Settings2 className="mr-2 h-5 w-5" />
-          Exam Setup
-        </Button>
       </CardContent>
     </Card>
   );
