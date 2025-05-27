@@ -66,7 +66,6 @@ export function TimerCard({
   };
 
   const handleReset = () => {
-    // Removed confirmation dialog as per previous request
     setIsRunning(false);
     setTimeLeft(initialTotalSeconds);
   };
@@ -75,8 +74,7 @@ export function TimerCard({
     if (isRunning) return;
     setTimeLeft(prevTime => {
       const newTime = prevTime + (amount * 60);
-      // Ensure newTime is not less than 0 and not more than a reasonable maximum (e.g., 24 hours from initialTotalSeconds or current timeLeft)
-      const maxAllowed = Math.max(initialTotalSeconds, prevTime) + (24 * 3600); // cap at 24 hours more than initial or current
+      const maxAllowed = Math.max(initialTotalSeconds, prevTime) + (24 * 3600); 
       return Math.max(0, Math.min(newTime, maxAllowed)); 
     });
   };
@@ -89,17 +87,11 @@ export function TimerCard({
 
   const handleSaveEditedTime = (newTimeInSeconds: number) => {
     setTimeLeft(newTimeInSeconds);
-    // If the user sets a time GREATER than the current initialTotalSeconds,
-    // update initialTotalSeconds to this new, larger value.
-    // This allows "Edit Time" to effectively increase the total possible duration.
     if (newTimeInSeconds > initialTotalSeconds) {
         setInitialTotalSeconds(newTimeInSeconds);
     }
   };
 
-  // Determine the maximum time for the edit modal. 
-  // It should be at least the initialTotalSeconds, or if timeLeft is already greater (due to past edits), use that.
-  // Add a buffer (e.g., 10 hours) to allow increasing time significantly.
   const maxTimeForModal = Math.max(initialTotalSeconds, timeLeft) + (10 * 3600);
 
 
@@ -122,9 +114,9 @@ export function TimerCard({
               <Icons.Minus className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
             <div 
-              className="text-6xl sm:text-7xl md:text-8xl font-mono font-extrabold tabular-nums select-none flex-shrink min-w-0" // Added flex-shrink and min-w-0
+              className="text-6xl sm:text-7xl md:text-8xl font-mono font-extrabold tabular-nums select-none flex-shrink min-w-0"
               style={{ 
-                color: timeLeft <= 300 && timeLeft > 0 ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))',
+                color: 'hsl(var(--foreground))', // Removed 5-minute warning color change
                 cursor: isRunning ? 'default' : 'pointer'
               }}
               onClick={handleTimeDisplayClick}
@@ -181,3 +173,4 @@ export function TimerCard({
     </>
   );
 }
+

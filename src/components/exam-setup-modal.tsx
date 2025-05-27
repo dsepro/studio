@@ -16,14 +16,7 @@ import { Icons } from "@/components/icons";
 import type { ExamDetails } from '@/app/page';
 import { ScrollArea } from './ui/scroll-area';
 
-interface ExamSetupModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentDetails: ExamDetails;
-  onSave: (newDetails: ExamDetails) => void;
-  currentAppLanguage: string;
-}
-
+// Helper to derive title from subject and paper
 const deriveTitle = (subject: string, paper: string, lang: string): string => {
   const s = subject?.trim() || "";
   const p = paper?.trim() || "";
@@ -57,10 +50,12 @@ export function ExamSetupModal({
 
   useEffect(() => {
     if (isOpen) {
+      // Initialize with current details, applying defaults if necessary
       let initialStartTime = currentDetails.examStartTime || "08:30";
       let initialDuration = currentDetails.durationMinutes >= 0 ? currentDetails.durationMinutes : 90;
       let initialEndTime = currentDetails.examEndTime || calculateEndTime(initialStartTime, initialDuration);
       
+      // Ensure end time is calculated if not present or inconsistent
       if (!currentDetails.examEndTime && initialStartTime && initialDuration >= 0) {
         initialEndTime = calculateEndTime(initialStartTime, initialDuration);
       }
@@ -99,10 +94,12 @@ export function ExamSetupModal({
         newPaper = value;
       }
       
+      // Always derive title from subject and paper if they are being changed
       if (name === "subject" || name === "paper") {
         updatedFormState.title = deriveTitle(newSubject, newPaper, currentAppLanguage);
       }
 
+      // Always calculate end time if start time or duration changes
       if (name === "examStartTime" || name === "durationMinutes") {
         updatedFormState.examEndTime = calculateEndTime(newStartTime, newDuration);
       }
@@ -118,7 +115,7 @@ export function ExamSetupModal({
       return {
         ...prev,
         durationMinutes: newDuration,
-        title: deriveTitle(prev.subject, prev.paper, currentAppLanguage), 
+        title: deriveTitle(prev.subject, prev.paper, currentAppLanguage), // Keep title derived
         examEndTime: newEndTime,
       };
     });
@@ -131,10 +128,13 @@ export function ExamSetupModal({
   const handleSave = () => {
     let finalDetails = { ...formState };
     
+    // Ensure title is correctly derived before saving
     finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper, currentAppLanguage);
     if (!finalDetails.title.trim()) {
       finalDetails.title = currentAppLanguage === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
+    
+    // Ensure end time is correctly calculated
     finalDetails.examEndTime = calculateEndTime(finalDetails.examStartTime, finalDetails.durationMinutes);
     
     onSave(finalDetails);
@@ -236,14 +236,12 @@ export function ExamSetupModal({
                 <Button
                   variant={formState.examLanguage === 'zh-hk' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('zh-hk')}
-                  className={formState.examLanguage === 'zh-hk' ? 'bg-primary text-primary-foreground' : ''}
                 >
                   {T.langZhHkButton}
                 </Button>
                 <Button
                   variant={formState.examLanguage === 'en' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('en')}
-                  className={formState.examLanguage === 'en' ? 'bg-primary text-primary-foreground' : ''}
                 >
                   {T.langEnButton}
                 </Button>
