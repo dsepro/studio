@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter, // DialogDescription removed as per UI
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +24,8 @@ interface ExamSetupModalProps {
   onClose: () => void;
   currentDetails: ExamDetails;
   onSave: (newDetails: ExamDetails) => void;
-  language: string; // App's current display language ('en' or 'zh-hk')
-  currentAppLanguage: string; // To ensure preset titles are displayed correctly
+  language: string; 
+  currentAppLanguage: string; 
 }
 
 export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, language, currentAppLanguage }: ExamSetupModalProps) {
@@ -50,62 +50,76 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     if (selectedPreset) {
       const presetTitle = currentAppLanguage === 'zh-hk' ? selectedPreset.zhTitle : selectedPreset.enTitle;
       setDetails(prev => ({
-        ...prev, // Keep existing centreName, centreNumber, examStartTime, examEndTime, examLanguage
+        ...prev,
         title: presetTitle,
         subject: presetTitle, 
         paper: "", 
         durationMinutes: selectedPreset.durationMinutes,
       }));
     } else {
-      // If "Custom Input" is selected, user can freely edit.
-      // Title will be derived from subject and paper if they change.
-      // No specific action needed here beyond setting selectedPresetId.
+      // Switched to "Manual Input" from a preset
+      // Title will be derived from subject/paper if they are subsequently changed, or on save.
+      // Or, if user wants immediate title update when switching to manual:
+      // setDetails(prev => ({ ...prev, title: (prev.subject || "") + (prev.paper ? ` ${prev.paper}` : "") }));
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    setDetails(prev => {
+    setDetails(prevDetails => {
       const newDetails = {
-        ...prev,
-        [name]: name === "durationMinutes" ? (parseInt(value, 10) || 0) : value,
+        ...prevDetails,
+        [name]: name === "durationMinutes" ? (Math.max(0, parseInt(value, 10)) || 0) : value,
       };
 
-      // If subject or paper is changed, consider it manual input for title derivation
+      let newSelectedPresetId = selectedPresetId;
+
+      if (selectedPresetId) { 
+        const activePreset = examPresets.find(p => p.id === selectedPresetId);
+        if (activePreset) {
+          const presetSubject = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
+          // If subject or duration deviates from the active preset, clear preset selection
+          if ( (name === "subject" && newDetails.subject !== presetSubject) || 
+               (name === "durationMinutes" && newDetails.durationMinutes !== activePreset.durationMinutes) ) {
+            newSelectedPresetId = ""; 
+          }
+        }
+      }
+      
+      // If subject or paper is changed, it's definitely custom.
+      // This also handles the case where a preset was selected, then subject/paper edited.
       if (name === "subject" || name === "paper") {
-        setSelectedPresetId(""); // Clear preset selection
-        newDetails.title = (newDetails.subject || "") + (newDetails.paper ? ` ${newDetails.paper}` : "");
+        newSelectedPresetId = ""; 
+        newDetails.title = (newDetails.subject || "") + (newDetails.paper ? ` ${newDetails.paper}`.trimEnd() : "");
+      }
+      
+      if (newSelectedPresetId !== selectedPresetId) {
+        setSelectedPresetId(newSelectedPresetId); // Update preset dropdown display
       }
       return newDetails;
     });
   };
   
   const handleExamLanguageChange = (lang: 'en' | 'zh-hk') => {
-    // setSelectedPresetId(""); // Not strictly necessary to clear preset if only exam language changes
     setDetails(prev => ({ ...prev, examLanguage: lang }));
   };
 
   const handleSave = () => {
     let finalDetails = { ...details };
     
-    // Consolidate title: If title is empty or doesn't match subject/paper, and not from a selected preset that still matches subject/duration
     const activePreset = examPresets.find(p => p.id === selectedPresetId);
-    let currentPresetTitle = "";
-    if (activePreset) {
-        currentPresetTitle = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
-    }
 
-    if (selectedPresetId && activePreset && finalDetails.subject === currentPresetTitle && finalDetails.durationMinutes === activePreset.durationMinutes) {
-        // If a preset is selected and subject/duration match, use preset title
-        finalDetails.title = currentPresetTitle;
+    // If a preset is still selected, it implies subject and duration match it.
+    if (activePreset) {
+        finalDetails.title = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
     } else {
-        // Otherwise, derive from subject and paper
-        const derivedTitle = (finalDetails.subject || "") + (finalDetails.paper ? ` ${finalDetails.paper}` : "");
+        // Otherwise (no preset, or it was cleared due to edits), derive title from subject and paper.
+        const derivedTitle = (finalDetails.subject || "") + (finalDetails.paper ? ` ${finalDetails.paper}`.trimEnd() : "");
         finalDetails.title = derivedTitle.trim();
     }
 
-    // If title is still empty (e.g., subject and paper are empty), provide a default
+    // If title is still empty after derivation (e.g., subject and paper are empty), provide a default.
     if (!finalDetails.title.trim()) {
       finalDetails.title = language === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
@@ -145,7 +159,7 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     examEndTimeLabel: language === 'zh-hk' ? '至' : 'To',
     examLanguageTitle: language === 'zh-hk' ? '試卷語言' : 'Exam Language',
     languageLabel: language === 'zh-hk' ? '語言:' : 'Language:',
-    langZhHkButton: language === 'zh-hk' ? '中文' : '中文',
+    langZhHkButton: language === 'zh-hk' ? '中文' : '中文', // For 'zh-hk'
     langEnButton: language === 'zh-hk' ? 'English' : 'English',
     downloadAppButton: language === 'zh-hk' ? '下載應用程式' : 'Download App',
     cancelButton: language === 'zh-hk' ? '取消' : 'Cancel',
@@ -215,7 +229,7 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               <h3 className="text-lg font-semibold text-foreground">{T.timingTitle}</h3>
               <div>
                 <Label htmlFor="durationMinutes" className="text-foreground/90">{T.durationMinutesLabel}</Label>
-                <Input id="durationMinutes" name="durationMinutes" type="number" value={details.durationMinutes} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
+                <Input id="durationMinutes" name="durationMinutes" type="number" value={details.durationMinutes} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" min="0" />
               </div>
               <div>
                 <Label className="text-foreground/90">{T.examTimeLabel}</Label>
@@ -260,3 +274,6 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     </Dialog>
   );
 }
+
+
+    
