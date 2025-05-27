@@ -20,7 +20,7 @@ interface ConfirmationDialogProps {
   description: string;
   confirmText?: string;
   cancelText?: string;
-  language?: string; // Added language prop
+  language?: string; 
 }
 
 export function ConfirmationDialog({
@@ -31,13 +31,13 @@ export function ConfirmationDialog({
   description,
   confirmText,
   cancelText,
-  language = 'en', // Default to English
+  language = 'en', 
 }: ConfirmationDialogProps) {
   if (!isOpen) return null;
 
   const T = {
-    defaultConfirmText: language === 'zh' ? '确认' : 'Confirm',
-    defaultCancelText: language === 'zh' ? '取消' : 'Cancel',
+    defaultConfirmText: language === 'zh-hk' ? '確認' : 'Confirm',
+    defaultCancelText: language === 'zh-hk' ? '取消' : 'Cancel',
   };
 
   return (

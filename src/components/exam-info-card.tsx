@@ -11,13 +11,13 @@ interface ExamInfoCardProps {
 
 export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   const T = {
-    cardTitle: language === 'zh' ? '考试信息' : 'Exam Information',
-    examTitleLabel: language === 'zh' ? '考试名称:' : 'Exam Title:',
-    examCodeLabel: language === 'zh' ? '考试代码:' : 'Exam Code:',
-    subjectLabel: language === 'zh' ? '科目:' : 'Subject:',
-    timeAllowedLabel: language === 'zh' ? '允许时间:' : 'Time Allowed:',
-    instructionsLabel: language === 'zh' ? '考试说明:' : 'Instructions:',
-    noInstructions: language === 'zh' ? '未提供具体说明.' : 'No specific instructions provided.',
+    cardTitle: language === 'zh-hk' ? '考試資訊' : 'Exam Information',
+    examTitleLabel: language === 'zh-hk' ? '考試名稱:' : 'Exam Title:',
+    examCodeLabel: language === 'zh-hk' ? '考試代號:' : 'Exam Code:',
+    subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
+    timeAllowedLabel: language === 'zh-hk' ? '允許時間:' : 'Time Allowed:',
+    instructionsLabel: language === 'zh-hk' ? '考試說明:' : 'Instructions:',
+    noInstructions: language === 'zh-hk' ? '未提供具體說明。' : 'No specific instructions provided.',
   };
 
   return (

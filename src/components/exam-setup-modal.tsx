@@ -33,10 +33,9 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
 
   useEffect(() => {
     setDetails(currentDetails);
-    // Try to find if currentDetails match a preset
     const matchedPreset = examPresets.find(p => 
-      (language === 'zh' ? p.zhTitle : p.enTitle) === currentDetails.title &&
-      formatDurationFromMinutes(p.durationMinutes) === currentDetails.timeAllowed
+      (language === 'zh-hk' ? p.zhTitle : p.enTitle) === currentDetails.title &&
+      formatDurationFromMinutes(p.durationMinutes, language) === currentDetails.timeAllowed
     );
     setSelectedPresetId(matchedPreset ? matchedPreset.id : "");
   }, [currentDetails, isOpen, language]);
@@ -45,23 +44,21 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     setSelectedPresetId(presetId);
     const selectedPreset = examPresets.find(p => p.id === presetId);
     if (selectedPreset) {
-      const title = language === 'zh' ? selectedPreset.zhTitle : selectedPreset.enTitle;
+      const title = language === 'zh-hk' ? selectedPreset.zhTitle : selectedPreset.enTitle;
       setDetails({
         title: title,
-        code: "PRESET", // Generic code for presets
-        subject: title, // Use title as subject for presets
-        timeAllowed: formatDurationFromMinutes(selectedPreset.durationMinutes),
-        instructions: [], // Empty instructions for presets
+        code: "PRESET", 
+        subject: title, 
+        timeAllowed: formatDurationFromMinutes(selectedPreset.durationMinutes, language),
+        instructions: [], 
       });
     } else {
-      // "Custom" or if somehow no preset found, reset to current or initial
       setDetails(currentDetails); 
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    // If user manually changes a field, we assume it's custom, deselect preset
     setSelectedPresetId(""); 
     if (name === "instructions") {
       setDetails(prev => ({ ...prev, instructions: value.split('\n') }));
@@ -76,24 +73,24 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
   };
 
   const T = {
-    modalTitle: language === 'zh' ? '考试设置' : 'Exam Setup',
-    modalDescription: language === 'zh' ? '配置当前考试的详细信息，或从预设中选择。' : 'Configure the details for the current exam, or choose from a preset.',
-    selectPresetLabel: language === 'zh' ? '选择预设考试' : 'Select Preset Exam',
-    selectPresetPlaceholder: language === 'zh' ? '选择一个预设...' : 'Select a preset...',
-    customPresetOption: language === 'zh' ? '自定义输入' : 'Custom Input',
-    examTitleLabel: language === 'zh' ? '考试名称' : 'Exam Title',
-    examCodeLabel: language === 'zh' ? '考试代码' : 'Exam Code',
-    subjectLabel: language === 'zh' ? '科目' : 'Subject',
-    timeAllowedLabel: language === 'zh' ? '允许时间 (例如: 2 小时 15 分钟)' : 'Time Allowed (e.g., 2 hours 15 minutes)',
-    instructionsLabel: language === 'zh' ? '考试说明 (每行一条)' : 'Instructions (one per line)',
-    cancelButton: language === 'zh' ? '取消' : 'Cancel',
-    saveButton: language === 'zh' ? '保存更改' : 'Save Changes',
+    modalTitle: language === 'zh-hk' ? '考試設定' : 'Exam Setup',
+    modalDescription: language === 'zh-hk' ? '配置目前考試的詳細資訊，或從預設集中選擇。' : 'Configure the details for the current exam, or choose from a preset.',
+    selectPresetLabel: language === 'zh-hk' ? '選擇預設考試' : 'Select Preset Exam',
+    selectPresetPlaceholder: language === 'zh-hk' ? '選擇一個預設...' : 'Select a preset...',
+    customPresetOption: language === 'zh-hk' ? '自訂輸入' : 'Custom Input',
+    examTitleLabel: language === 'zh-hk' ? '考試名稱' : 'Exam Title',
+    examCodeLabel: language === 'zh-hk' ? '考試代號' : 'Exam Code',
+    subjectLabel: language === 'zh-hk' ? '科目' : 'Subject',
+    timeAllowedLabel: language === 'zh-hk' ? '允許時間 (例如: 2 小時 15 分鐘)' : 'Time Allowed (e.g., 2 hours 15 minutes)',
+    instructionsLabel: language === 'zh-hk' ? '考試說明 (每行一條)' : 'Instructions (one per line)',
+    cancelButton: language === 'zh-hk' ? '取消' : 'Cancel',
+    saveButton: language === 'zh-hk' ? '儲存變更' : 'Save Changes',
   };
 
   const displayedPresets = useMemo(() => {
     return examPresets.map(preset => ({
       ...preset,
-      displayTitle: language === 'zh' ? preset.zhTitle : preset.enTitle,
+      displayTitle: language === 'zh-hk' ? preset.zhTitle : preset.enTitle,
     })).sort((a,b) => a.displayTitle.localeCompare(b.displayTitle));
   }, [language]);
 
@@ -120,7 +117,7 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
                 <SelectItem value="">{T.customPresetOption}</SelectItem>
                 {displayedPresets.map((preset) => (
                   <SelectItem key={preset.id} value={preset.id}>
-                    {preset.displayTitle} ({formatDurationFromMinutes(preset.durationMinutes)})
+                    {preset.displayTitle} ({formatDurationFromMinutes(preset.durationMinutes, language)})
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -35,7 +35,7 @@ const initialExamDetails: ExamDetails = {
 export default function Home() {
   const [fontScale, setFontScale] = useLocalStorage<number>('fontScale', 1);
   const [examDetails, setExamDetails] = useLocalStorage<ExamDetails>('examDetails', initialExamDetails);
-  const [language, setLanguage] = useLocalStorage<string>('language', 'en'); // 'en' or 'zh'
+  const [language, setLanguage] = useLocalStorage<string>('language', 'en'); // 'en' or 'zh-hk'
 
   const [isUserManualOpen, setIsUserManualOpen] = useState(false);
   const [isExamSetupOpen, setIsExamSetupOpen] = useState(false);
@@ -59,7 +59,9 @@ export default function Home() {
     setConfirmationState(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  const appTitle = language === 'zh' ? '考试信息板' : 'Exam Info Board';
+  const appTitle = language === 'zh-hk' ? '考試資訊板' : 'Exam Info Board';
+  const appFooterRights = language === 'zh-hk' ? '版權所有。' : 'All rights reserved.';
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -85,7 +87,6 @@ export default function Home() {
       <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8">
         <div className="grid grid-cols-1 gap-6">
           <TimerCard 
-            onOpenConfirmation={handleOpenConfirmation} 
             initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)}
             language={language}
           />
@@ -94,7 +95,7 @@ export default function Home() {
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground border-t">
-        © {new Date().getFullYear()} {appTitle}. {language === 'zh' ? '版权所有.' : 'All rights reserved.'}
+        © {new Date().getFullYear()} {appTitle}. {appFooterRights}
       </footer>
 
       <UserManualModal isOpen={isUserManualOpen} onClose={() => setIsUserManualOpen(false)} language={language} />
@@ -121,12 +122,20 @@ function parseDurationToMinutes(durationStr: string): number {
   let totalMinutes = 0;
   const hoursMatch = durationStr.match(/(\d+)\s*hours?/i);
   const minutesMatch = durationStr.match(/(\d+)\s*minutes?/i);
+  const hourZhMatch = durationStr.match(/(\d+)\s*小時/i);
+  const minuteZhMatch = durationStr.match(/(\d+)\s*分鐘/i);
+
 
   if (hoursMatch && hoursMatch[1]) {
     totalMinutes += parseInt(hoursMatch[1], 10) * 60;
+  } else if (hourZhMatch && hourZhMatch[1]) {
+    totalMinutes += parseInt(hourZhMatch[1], 10) * 60;
   }
+
   if (minutesMatch && minutesMatch[1]) {
     totalMinutes += parseInt(minutesMatch[1], 10);
+  } else if (minuteZhMatch && minuteZhMatch[1]) {
+     totalMinutes += parseInt(minuteZhMatch[1], 10);
   }
   
   return totalMinutes > 0 ? totalMinutes : 135; // Default to 135 minutes (2h 15m) if parsing fails

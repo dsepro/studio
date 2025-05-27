@@ -56,24 +56,22 @@ export const examPresets: ExamPreset[] = [
   { id: 'econ_2', enTitle: 'Economics (II)', zhTitle: '經濟（二）', durationMinutes: 150 },
 ];
 
-export function formatDurationFromMinutes(totalMinutes: number): string {
-  if (totalMinutes <= 0) return language === 'zh' ? "0 分钟" : "0 minutes";
+export function formatDurationFromMinutes(totalMinutes: number, language: string): string {
+  if (totalMinutes <= 0) return language === 'zh-hk' ? "0 分鐘" : "0 minutes";
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   let result = "";
-  const language = typeof window !== "undefined" ? localStorage.getItem("language")?.replace(/"/g, '') || 'en' : 'en';
 
-
-  if (language === 'zh') {
+  if (language === 'zh-hk') {
     if (hours > 0) {
-      result += `${hours} 小时`;
+      result += `${hours} 小時`;
     }
     if (minutes > 0) {
       if (result.length > 0) result += " ";
-      result += `${minutes} 分钟`;
+      result += `${minutes} 分鐘`;
     }
-    return result || "0 分钟";
-  } else {
+    return result || "0 分鐘";
+  } else { // Default to English
     if (hours > 0) {
       result += `${hours} hour${hours > 1 ? 's' : ''}`;
     }

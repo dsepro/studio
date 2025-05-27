@@ -52,26 +52,30 @@
   .dark {
     --background: 222 47% 11%; /* #0f172a */
     --foreground: 215 28% 90%; /* #e2e8f0 */
-    --card: 215 39% 17%; /* #1e293b */
+    --card: 215 39% 17%; /* #1e293b - Keeping card slightly lighter than main bg */
     --card-foreground: 215 28% 90%; /* #e2e8f0 */
     --popover: 215 39% 17%; /* #1e293b */
     --popover-foreground: 215 28% 90%; /* #e2e8f0 */
-    --primary: 200 90% 50%; /* #0ea5e9 */
-    --primary-foreground: 0 0% 100%; /* #ffffff */
-    --secondary: 215 28% 26%; /* #334155 */
-    --secondary-foreground: 215 28% 90%; /* #e2e8f0 */
+    
+    /* Updated for timer card UI based on image */
+    --primary: 187 70% 50%; /* cyan for Start button */
+    --primary-foreground: 222 47% 11%; /* dark slate for text on cyan */
+    --secondary: 220 13% 25%; /* dark muted blue/gray for Stop button */
+    --secondary-foreground: 215 28% 80%; /* light gray text for Stop button */
+    --destructive: 0 80% 60%; /* bright red for Reset button */
+    --destructive-foreground: 0 0% 100%; /* white text for Reset button */
+
     --muted: 215 28% 26%; /* #334155 */
     --muted-foreground: 216 19% 65%; /* #94a3b8 */
-    --accent: 200 90% 50%; /* #0ea5e9 */
-    --accent-foreground: 0 0% 100%; /* #ffffff */
-    --destructive: 349 89% 60%; /* #f43f5e */
-    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --accent: 187 70% 50%; /* using primary cyan as accent too for consistency */
+    --accent-foreground: 222 47% 11%; /* dark slate for text on accent */
+    
     --success: 145 58% 55%; /* #66BB6A */
     --success-foreground: 0 0% 0%; /* black */
     --border: 215 28% 26%; /* #334155 */
     --input: 222 47% 11%; /* #0f172a */
     --input-foreground: 215 28% 90%; /* #e2e8f0 */
-    --ring: 200 90% 50%; /* #0ea5e9 */
+    --ring: 187 70% 50%; /* cyan for ring */
     
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -119,9 +123,8 @@
   }
 }
 
-/* Removed btn-timer-adjust as specific adjustment buttons were removed from TimerCard */
-
 /* General success button style (can be used if needed, TimerCard now uses primary for Start) */
 .btn-success {
   @apply bg-success text-success-foreground hover:opacity-90;
 }
+

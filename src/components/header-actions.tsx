@@ -61,11 +61,11 @@ export function HeaderActions({
   }, [theme, themes, setTheme]);
 
   const toggleLanguage = useCallback(() => {
-    const newLanguage = currentLanguage === "en" ? "zh" : "en";
+    const newLanguage = currentLanguage === "en" ? "zh-hk" : "en";
     onLanguageChange(newLanguage);
     toast({
-      title: newLanguage === 'zh' ? "语言已切换" : "Language Switched",
-      description: newLanguage === 'zh' ? `语言已设为中文` : `Language set to English.`,
+      title: newLanguage === 'zh-hk' ? "語言已切換" : "Language Switched",
+      description: newLanguage === 'zh-hk' ? `語言已設為繁體中文` : `Language set to English.`,
       duration: 2000,
     })
   }, [currentLanguage, onLanguageChange, toast]);
@@ -76,11 +76,11 @@ export function HeaderActions({
 
   const handleAppInstallInfo = () => {
     toast({
-      title: currentLanguage === 'zh' ? "应用安装 (PWA)" : "App Installation (PWA)",
+      title: currentLanguage === 'zh-hk' ? "應用程式安裝 (PWA)" : "App Installation (PWA)",
       description: (
         <div>
-          <p>{currentLanguage === 'zh' ? "此应用程序是一个渐进式网络应用 (PWA)，可以安装在您的设备上。" : "This application is a Progressive Web App (PWA) and can be installed on your device."}</p>
-          <p>{currentLanguage === 'zh' ? "在浏览器的菜单中查找“安装”、“添加到主屏幕”或类似选项，即可离线使用并获得类似原生应用的体验。" : "Look for an \"Install,\" \"Add to Home Screen,\" or similar option in your browser's menu to use it offline and like a native app."}</p>
+          <p>{currentLanguage === 'zh-hk' ? "此應用程式是一個漸進式網絡應用程式 (PWA)，可以安裝在您的裝置上。" : "This application is a Progressive Web App (PWA) and can be installed on your device."}</p>
+          <p>{currentLanguage === 'zh-hk' ? "在瀏覽器的選單中查找「安裝」、「新增至主畫面」或類似選項，即可離線使用並獲得類似原生應用程式的體驗。" : "Look for an \"Install,\" \"Add to Home Screen,\" or similar option in your browser's menu to use it offline and like a native app."}</p>
         </div>
       ),
       duration: 10000,
@@ -94,21 +94,21 @@ export function HeaderActions({
   };
   
   const T = {
-    adjustFontSize: currentLanguage === 'zh' ? '调整字号' : 'Adjust font size',
-    fontScale: currentLanguage === 'zh' ? '字号缩放' : 'Font Scale',
-    cycleTheme: currentLanguage === 'zh' ? `切换主题 (当前为 ${theme})` : `Cycle theme (Currently ${theme})`,
-    examSetup: currentLanguage === 'zh' ? '考试设置' : 'Exam Setup',
-    toggleLanguage: currentLanguage === 'zh' ? `切换语言 (当前为 ${currentLanguage === 'zh' ? '中文' : 'EN'})` : `Toggle language (Currently ${currentLanguage === 'zh' ? '中文' : 'EN'})`,
-    toggleFullscreen: currentLanguage === 'zh' ? '切换全屏' : 'Toggle fullscreen',
-    openUserManual: currentLanguage === 'zh' ? '打开用户手册' : 'Open user manual',
-    installApp: currentLanguage === 'zh' ? '安装应用 / 离线使用信息' : 'Install App / Offline Use Info',
+    adjustFontSize: currentLanguage === 'zh-hk' ? '調整字型大小' : 'Adjust font size',
+    fontScale: currentLanguage === 'zh-hk' ? '字型縮放' : 'Font Scale',
+    cycleTheme: currentLanguage === 'zh-hk' ? `切換主題 (目前為 ${theme === 'light' ? '淺色' : theme === 'dark' ? '深色' : '系統'})` : `Cycle theme (Currently ${theme})`,
+    examSetup: currentLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
+    toggleLanguage: currentLanguage === 'zh-hk' ? `切換語言 (目前為 繁)` : `Toggle language (Currently EN)`,
+    toggleFullscreen: currentLanguage === 'zh-hk' ? '切換全螢幕' : 'Toggle fullscreen',
+    openUserManual: currentLanguage === 'zh-hk' ? '開啟用戶手冊' : 'Open user manual',
+    installApp: currentLanguage === 'zh-hk' ? '安裝應用程式 / 離線使用資訊' : 'Install App / Offline Use Info',
   };
 
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" aria-label={T.adjustFontSize}>
             <Icons.ALargeSmall className="h-5 w-5" />
             <span className="sr-only">{T.adjustFontSize}</span>
           </Button>
@@ -138,28 +138,27 @@ export function HeaderActions({
         <span className="sr-only">{T.cycleTheme}</span>
       </Button>
 
-      <Button variant="outline" size="icon" onClick={onOpenExamSetup}>
+      <Button variant="outline" size="icon" onClick={onOpenExamSetup} aria-label={T.examSetup}>
         <Icons.Settings2 className="h-5 w-5" />
         <span className="sr-only">{T.examSetup}</span>
       </Button>
       
       <Button variant="outline" size="icon" onClick={toggleLanguage} aria-label={T.toggleLanguage}>
-        {/* <Icons.Languages className="h-5 w-5" /> */}
-        <span className="text-xs font-semibold w-5 h-5 flex items-center justify-center">{currentLanguage === 'zh' ? '中' : 'EN'}</span>
+        <span className="text-xs font-semibold w-5 h-5 flex items-center justify-center">{currentLanguage === 'zh-hk' ? '繁' : 'EN'}</span>
         <span className="sr-only">{T.toggleLanguage}</span>
       </Button>
 
-      <Button variant="outline" size="icon" onClick={toggleFullScreen}>
+      <Button variant="outline" size="icon" onClick={toggleFullScreen} aria-label={T.toggleFullscreen}>
         {isFullScreen ? <Icons.Shrink className="h-5 w-5" /> : <Icons.Expand className="h-5 w-5" />}
         <span className="sr-only">{T.toggleFullscreen}</span>
       </Button>
 
-      <Button variant="outline" size="icon" onClick={onOpenUserManual}>
+      <Button variant="outline" size="icon" onClick={onOpenUserManual} aria-label={T.openUserManual}>
         <Icons.BookOpenText className="h-5 w-5" />
         <span className="sr-only">{T.openUserManual}</span>
       </Button>
 
-      <Button variant="outline" size="icon" onClick={handleAppInstallInfo}>
+      <Button variant="outline" size="icon" onClick={handleAppInstallInfo} aria-label={T.installApp}>
         <Icons.Download className="h-5 w-5" />
         <span className="sr-only">{T.installApp}</span>
       </Button>
