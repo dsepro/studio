@@ -4,7 +4,11 @@
 import { useState, useEffect } from 'react';
 import { Icons } from '@/components/icons';
 
-export function MainClock() {
+interface MainClockProps {
+  language: string;
+}
+
+export function MainClock({ language }: MainClockProps) {
   // Initialize with a static placeholder string to prevent hydration mismatch
   const [formattedTime, setFormattedTime] = useState<string>("00:00:00");
 
@@ -12,10 +16,12 @@ export function MainClock() {
     // This function will run only on the client side after hydration
     const updateClock = () => {
       const now = new Date();
-      const timeString = now.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
+      const locale = language === 'zh-hk' ? 'zh-HK' : 'en-GB'; // en-GB for 24-hour English
+      const timeString = now.toLocaleTimeString(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23' // Explicitly ensure 24-hour format
       });
       setFormattedTime(timeString);
     };
@@ -24,7 +30,7 @@ export function MainClock() {
     const timerId = setInterval(updateClock, 1000); // Continue updating every second
 
     return () => clearInterval(timerId); // Cleanup interval on component unmount
-  }, []); // Empty dependency array ensures this effect runs only once on the client after mount
+  }, [language]); // Rerun effect if language changes
 
   return (
     <div className="flex items-center space-x-2 text-sm font-medium">

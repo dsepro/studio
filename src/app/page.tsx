@@ -24,12 +24,12 @@ export interface ExamDetails {
 }
 
 const initialExamDetails: ExamDetails = {
-  title: "Chinese Language Paper 1", 
-  centreName: "ABC Secondary School", 
-  centreNumber: "A1234", 
-  subject: "Chinese Language", 
-  paper: "Paper 1",   
-  durationMinutes: 90, 
+  title: "Chinese Language Paper 1",
+  centreName: "ABC Secondary School",
+  centreNumber: "A1234",
+  subject: "Chinese Language",
+  paper: "Paper 1",
+  durationMinutes: 90,
   examStartTime: "08:30",
   examEndTime: "10:00",
   examLanguage: 'en',
@@ -39,11 +39,11 @@ const initialExamDetails: ExamDetails = {
 export default function Home() {
   const [fontScale, setFontScale] = useLocalStorage<number>('fontScale', 1);
   const [examDetails, setExamDetails] = useLocalStorage<ExamDetails>('examDetails', initialExamDetails);
-  const [language, setLanguage] = useLocalStorage<string>('language', 'en'); 
+  const [language, setLanguage] = useLocalStorage<string>('language', 'en');
 
   const [isUserManualOpen, setIsUserManualOpen] = useState(false);
   const [isExamSetupOpen, setIsExamSetupOpen] = useState(false);
-  
+
   const [confirmationState, setConfirmationState] = useState<{
     isOpen: boolean;
     title: string;
@@ -63,22 +63,22 @@ export default function Home() {
     setConfirmationState(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Exam Info';
   const appFooterCreator = language === 'zh-hk' ? '由鍾永老師製作' : 'Created by Mr. Louis Chung';
+  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Exam Info';
 
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl"> {/* Increased max-width */}
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <MainClock />
+              <MainClock language={language} />
               <h1 className="text-xl font-semibold hidden sm:block">{appTitle}</h1>
             </div>
-            <HeaderActions 
+            <HeaderActions
               onOpenUserManual={() => setIsUserManualOpen(true)}
-              onOpenExamSetup={() => setIsExamSetupOpen(true)} 
+              onOpenExamSetup={() => setIsExamSetupOpen(true)}
               fontScale={fontScale}
               onFontScaleChange={setFontScale}
               currentLanguage={language}
@@ -88,10 +88,10 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow flex flex-col container mx-auto max-w-5xl p-4 md:p-6 lg:p-8 w-full">
+      <main className="flex-grow flex flex-col container mx-auto max-w-7xl p-4 md:p-6 lg:p-8 w-full"> {/* Increased max-width */}
         <div className="flex flex-col gap-6 flex-grow">
           <div className="flex-[2_2_0%] min-h-0"> {/* TimerCard wrapper */}
-            <TimerCard 
+            <TimerCard
               initialDurationMinutes={examDetails.durationMinutes}
               language={language}
               onOpenConfirmation={handleOpenConfirmation}
@@ -104,8 +104,7 @@ export default function Home() {
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground border-t">
-        {appFooterCreator} <br />
-        © {new Date().getFullYear()} {appTitle}
+        {appFooterCreator}
       </footer>
 
       <UserManualModal isOpen={isUserManualOpen} onClose={() => setIsUserManualOpen(false)} language={language} />
