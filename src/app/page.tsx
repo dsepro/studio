@@ -39,7 +39,7 @@ const initialExamDetails: ExamDetails = {
 export default function Home() {
   const [fontScale, setFontScale] = useLocalStorage<number>('fontScale', 1);
   const [examDetails, setExamDetails] = useLocalStorage<ExamDetails>('examDetails', initialExamDetails);
-  const [language, setLanguage] = useLocalStorage<string>('language', 'en');
+  const [language, setLanguage] = useLocalStorage<string>('language', 'zh-hk');
 
   const [isUserManualOpen, setIsUserManualOpen] = useState(false);
   const [isExamSetupOpen, setIsExamSetupOpen] = useState(false);
@@ -68,12 +68,12 @@ export default function Home() {
 
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl"> {/* Increased max-width */}
+    <div className="relative flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
+      <MainClock language={language} className="absolute top-4 right-4 z-50 text-sm font-medium" />
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <MainClock language={language} />
               <h1 className="text-xl font-semibold hidden sm:block">{appTitle}</h1>
             </div>
             <HeaderActions
@@ -88,22 +88,22 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow flex flex-col container mx-auto max-w-7xl p-4 md:p-6 lg:p-8 w-full"> {/* Increased max-width */}
+      <main className="flex-grow flex flex-col container mx-auto max-w-7xl p-4 md:p-6 lg:p-8 w-full">
         <div className="flex flex-col gap-6 flex-grow">
-          <div className="flex-[2_2_0%] min-h-0"> {/* TimerCard wrapper */}
+          <div className="flex-[2_2_0%] min-h-0">
             <TimerCard
               initialDurationMinutes={examDetails.durationMinutes}
               language={language}
               onOpenConfirmation={handleOpenConfirmation}
             />
           </div>
-          <div className="flex-[1_1_0%] min-h-0"> {/* ExamInfoCard wrapper */}
+          <div className="flex-[1_1_0%] min-h-0">
             <ExamInfoCard examDetails={examDetails} language={language} />
           </div>
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs text-muted-foreground border-t">
+      <footer className="py-4 text-center text-xs text-muted-foreground border-t">
         {appFooterCreator}
       </footer>
 
