@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ExamDetails } from '@/app/page';
 import { ScrollArea } from './ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { examPresets, formatDurationFromMinutes, type ExamPreset } from '@/lib/exam-presets';
 
 interface ExamSetupModalProps {
   isOpen: boolean;
@@ -27,13 +29,40 @@ interface ExamSetupModalProps {
 
 export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, language }: ExamSetupModalProps) {
   const [details, setDetails] = useState<ExamDetails>(currentDetails);
+  const [selectedPresetId, setSelectedPresetId] = useState<string>("");
 
   useEffect(() => {
     setDetails(currentDetails);
-  }, [currentDetails, isOpen]); // Reset form when modal opens or currentDetails change
+    // Try to find if currentDetails match a preset
+    const matchedPreset = examPresets.find(p => 
+      (language === 'zh' ? p.zhTitle : p.enTitle) === currentDetails.title &&
+      formatDurationFromMinutes(p.durationMinutes) === currentDetails.timeAllowed
+    );
+    setSelectedPresetId(matchedPreset ? matchedPreset.id : "");
+  }, [currentDetails, isOpen, language]);
+
+  const handlePresetChange = (presetId: string) => {
+    setSelectedPresetId(presetId);
+    const selectedPreset = examPresets.find(p => p.id === presetId);
+    if (selectedPreset) {
+      const title = language === 'zh' ? selectedPreset.zhTitle : selectedPreset.enTitle;
+      setDetails({
+        title: title,
+        code: "PRESET", // Generic code for presets
+        subject: title, // Use title as subject for presets
+        timeAllowed: formatDurationFromMinutes(selectedPreset.durationMinutes),
+        instructions: [], // Empty instructions for presets
+      });
+    } else {
+      // "Custom" or if somehow no preset found, reset to current or initial
+      setDetails(currentDetails); 
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    // If user manually changes a field, we assume it's custom, deselect preset
+    setSelectedPresetId(""); 
     if (name === "instructions") {
       setDetails(prev => ({ ...prev, instructions: value.split('\n') }));
     } else {
@@ -48,15 +77,25 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
 
   const T = {
     modalTitle: language === 'zh' ? '考试设置' : 'Exam Setup',
-    modalDescription: language === 'zh' ? '配置当前考试的详细信息。' : 'Configure the details for the current exam.',
+    modalDescription: language === 'zh' ? '配置当前考试的详细信息，或从预设中选择。' : 'Configure the details for the current exam, or choose from a preset.',
+    selectPresetLabel: language === 'zh' ? '选择预设考试' : 'Select Preset Exam',
+    selectPresetPlaceholder: language === 'zh' ? '选择一个预设...' : 'Select a preset...',
+    customPresetOption: language === 'zh' ? '自定义输入' : 'Custom Input',
     examTitleLabel: language === 'zh' ? '考试名称' : 'Exam Title',
     examCodeLabel: language === 'zh' ? '考试代码' : 'Exam Code',
     subjectLabel: language === 'zh' ? '科目' : 'Subject',
-    timeAllowedLabel: language === 'zh' ? '允许时间' : 'Time Allowed',
+    timeAllowedLabel: language === 'zh' ? '允许时间 (例如: 2 小时 15 分钟)' : 'Time Allowed (e.g., 2 hours 15 minutes)',
     instructionsLabel: language === 'zh' ? '考试说明 (每行一条)' : 'Instructions (one per line)',
     cancelButton: language === 'zh' ? '取消' : 'Cancel',
     saveButton: language === 'zh' ? '保存更改' : 'Save Changes',
   };
+
+  const displayedPresets = useMemo(() => {
+    return examPresets.map(preset => ({
+      ...preset,
+      displayTitle: language === 'zh' ? preset.zhTitle : preset.enTitle,
+    })).sort((a,b) => a.displayTitle.localeCompare(b.displayTitle));
+  }, [language]);
 
   if (!isOpen) return null;
 
@@ -71,6 +110,23 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
         </DialogHeader>
         <ScrollArea className="h-[60vh] p-1 pr-4">
         <div className="space-y-4 py-4 pr-2">
+          <div>
+            <Label htmlFor="preset-select" className="text-foreground/90">{T.selectPresetLabel}</Label>
+            <Select value={selectedPresetId} onValueChange={handlePresetChange}>
+              <SelectTrigger id="preset-select" className="w-full mt-1">
+                <SelectValue placeholder={T.selectPresetPlaceholder} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">{T.customPresetOption}</SelectItem>
+                {displayedPresets.map((preset) => (
+                  <SelectItem key={preset.id} value={preset.id}>
+                    {preset.displayTitle} ({formatDurationFromMinutes(preset.durationMinutes)})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div>
             <Label htmlFor="title" className="text-foreground/90">{T.examTitleLabel}</Label>
             <Input id="title" name="title" value={details.title} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
