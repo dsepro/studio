@@ -10,7 +10,6 @@ import { ConfirmationDialog } from '@/components/confirmation-dialog';
 import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
 import useLocalStorage from '@/hooks/use-local-storage';
-// Removed formatDurationFromMinutes import as it's no longer used here directly
 
 export interface ExamDetails {
   title: string;
@@ -25,13 +24,13 @@ export interface ExamDetails {
 }
 
 const initialExamDetails: ExamDetails = {
-  title: "Custom Exam", // Generic title
-  centreName: "", 
-  centreNumber: "", 
-  subject: "Custom Subject", // Generic subject
-  paper: "Custom Paper",   // Generic paper
-  durationMinutes: 60, // Default duration
-  examStartTime: "09:00",
+  title: "Chinese Language Paper 1", 
+  centreName: "ABC Secondary School", 
+  centreNumber: "A1234", 
+  subject: "Chinese Language", 
+  paper: "Paper 1",   
+  durationMinutes: 90, 
+  examStartTime: "08:30",
   examEndTime: "10:00",
   examLanguage: 'en',
 };
@@ -66,6 +65,7 @@ export default function Home() {
 
   const appTitle = language === 'zh-hk' ? '考試資訊板' : 'Exam Info Board';
   const appFooterRights = language === 'zh-hk' ? '版權所有。' : 'All rights reserved.';
+  const appFooterCreator = language === 'zh-hk' ? '由鍾永老師製作' : 'Created by Mr. Louis Chung';
 
 
   return (
@@ -100,6 +100,7 @@ export default function Home() {
       </main>
 
       <footer className="py-6 text-center text-xs text-muted-foreground border-t">
+        {appFooterCreator} <br />
         © {new Date().getFullYear()} {appTitle}. {appFooterRights}
       </footer>
 
@@ -109,7 +110,6 @@ export default function Home() {
         onClose={() => setIsExamSetupOpen(false)}
         currentDetails={examDetails}
         onSave={(newDetails) => setExamDetails(newDetails)}
-        language={language} 
         currentAppLanguage={language}
       />
       <ConfirmationDialog
@@ -123,3 +123,4 @@ export default function Home() {
     </div>
   );
 }
+

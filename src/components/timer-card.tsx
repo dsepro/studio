@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import { Progress } from "@/components/ui/progress";
+// import { Progress } from "@/components/ui/progress"; // Progress bar removed
 import useLocalStorage from '@/hooks/use-local-storage';
-import { TimeEditModal } from './time-edit-modal'; // Import the new modal
+import { TimeEditModal } from './time-edit-modal'; 
 
 interface TimerCardProps {
   initialDurationMinutes?: number;
@@ -21,7 +21,7 @@ const formatTime = (totalSeconds: number): string => {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardProps) { 
+export function TimerCard({ initialDurationMinutes = 90, language }: TimerCardProps) { 
   const [initialTotalSeconds, setInitialTotalSeconds] = useLocalStorage<number>('timerInitialSeconds', initialDurationMinutes * 60);
   const [timeLeft, setTimeLeft] = useLocalStorage<number>('timerTimeLeft', initialTotalSeconds);
   const [isRunning, setIsRunning] = useLocalStorage<boolean>('timerIsRunning', false);
@@ -56,6 +56,7 @@ export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardP
     start: language === 'zh-hk' ? '開始' : 'Start',
     stop: language === 'zh-hk' ? '停止' : 'Stop',
     reset: language === 'zh-hk' ? '重設' : 'Reset',
+    editTime: language === 'zh-hk' ? '編輯時間' : 'Edit Time',
   };
 
   const handleReset = () => {
@@ -63,11 +64,11 @@ export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardP
     setTimeLeft(initialTotalSeconds);
   };
 
-  const adjustCurrentTime = (secondsAdjustment: number) => {
+  const adjustCurrentTimeByOneMinute = (amount: number) => {
     if (isRunning) return;
     setTimeLeft(prevTime => {
-      const newTime = prevTime + secondsAdjustment;
-      return Math.max(0, Math.min(newTime, initialTotalSeconds)); 
+      const newTime = prevTime + (amount * 60);
+      return Math.max(0, Math.min(newTime, initialTotalSeconds > newTime ? initialTotalSeconds : newTime + 360000)); // Cap at initial or allow more
     });
   };
 
@@ -79,13 +80,12 @@ export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardP
 
   const handleSaveEditedTime = (newTimeInSeconds: number) => {
     setTimeLeft(newTimeInSeconds);
-    // If new time is greater than initial, update initial as well
     if (newTimeInSeconds > initialTotalSeconds) {
         setInitialTotalSeconds(newTimeInSeconds);
     }
   };
 
-  const progressPercentage = initialTotalSeconds > 0 ? (timeLeft / initialTotalSeconds) * 100 : 0;
+  // const progressPercentage = initialTotalSeconds > 0 ? (timeLeft / initialTotalSeconds) * 100 : 0; // Progress bar removed
 
   return (
     <>
@@ -98,26 +98,29 @@ export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardP
             <Button 
               variant="outline" 
               size="icon" 
-              className="rounded-full h-10 w-10 sm:h-12 sm:w-12" 
-              onClick={() => adjustCurrentTime(-60)} 
+              className="rounded-full h-10 w-10 sm:h-12 sm:w-12 bg-timer-adjust-btn hover:bg-timer-adjust-btn-hover" 
+              onClick={() => adjustCurrentTimeByOneMinute(-1)} 
               disabled={isRunning}
               aria-label={language === 'zh-hk' ? "減少1分鐘" : "Decrease 1 minute"}
             >
               <Icons.Minus className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
             <div 
-              className="text-6xl sm:text-7xl md:text-8xl font-mono font-extrabold tabular-nums cursor-pointer select-none"
-              style={{ color: timeLeft <= 300 && timeLeft > 0 && !isRunning ? 'hsl(var(--destructive))' : timeLeft <= 300 && timeLeft > 0 && isRunning ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))' }}
+              className="text-6xl sm:text-7xl md:text-8xl font-mono font-extrabold tabular-nums select-none"
+              style={{ 
+                color: timeLeft <= 300 && timeLeft > 0 ? 'hsl(var(--destructive))' : 'hsl(var(--foreground))',
+                cursor: isRunning ? 'default' : 'pointer'
+              }}
               onClick={handleTimeDisplayClick}
-              title={!isRunning ? (language === 'zh-hk' ? '點擊編輯時間' : 'Click to edit time') : undefined}
+              title={!isRunning ? T.editTime : undefined}
             >
               {formatTime(timeLeft)}
             </div>
             <Button 
               variant="outline" 
               size="icon" 
-              className="rounded-full h-10 w-10 sm:h-12 sm:w-12" 
-              onClick={() => adjustCurrentTime(60)} 
+              className="rounded-full h-10 w-10 sm:h-12 sm:w-12 bg-timer-adjust-btn hover:bg-timer-adjust-btn-hover"
+              onClick={() => adjustCurrentTimeByOneMinute(1)} 
               disabled={isRunning}
               aria-label={language === 'zh-hk' ? "增加1分鐘" : "Increase 1 minute"}
             >
@@ -125,16 +128,29 @@ export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardP
             </Button>
           </div>
 
-          <Progress value={progressPercentage} className="w-full max-w-xs sm:max-w-sm h-2.5" />
+          {/* <Progress value={progressPercentage} className="w-full max-w-xs sm:max-w-sm h-2.5" /> */} {/* Progress bar removed */}
           
           <div className="flex justify-center space-x-2 sm:space-x-3 w-full max-w-xs sm:max-w-sm pt-2">
-            <Button onClick={handleStart} disabled={isRunning || timeLeft === 0} className="flex-1 text-sm sm:text-base py-2.5 h-auto">
+            <Button 
+              onClick={handleStart} 
+              disabled={isRunning || timeLeft === 0} 
+              className="flex-1 text-sm sm:text-base py-2.5 h-auto bg-primary text-primary-foreground hover:bg-primary/90"
+            >
                {T.start}
             </Button>
-            <Button onClick={handleStop} disabled={!isRunning} variant="secondary" className="flex-1 text-sm sm:text-base py-2.5 h-auto">
+            <Button 
+              onClick={handleStop} 
+              disabled={!isRunning} 
+              variant="secondary" 
+              className="flex-1 text-sm sm:text-base py-2.5 h-auto bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            >
                {T.stop}
             </Button>
-            <Button onClick={handleReset} variant="destructive" className="flex-1 text-sm sm:text-base py-2.5 h-auto">
+            <Button 
+              onClick={handleReset} 
+              variant="destructive" 
+              className="flex-1 text-sm sm:text-base py-2.5 h-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
                {T.reset}
             </Button>
           </div>
@@ -146,8 +162,9 @@ export function TimerCard({ initialDurationMinutes = 135, language }: TimerCardP
         currentTimeInSeconds={timeLeft}
         onSave={handleSaveEditedTime}
         language={language}
-        maxTimeInSeconds={initialTotalSeconds > timeLeft ? initialTotalSeconds : timeLeft + 36000} // Allow editing up to 10 hours more or initialTotal
+        maxTimeInSeconds={initialTotalSeconds > timeLeft ? initialTotalSeconds : timeLeft + 36000} 
       />
     </>
   );
 }
+

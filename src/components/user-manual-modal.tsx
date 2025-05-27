@@ -43,7 +43,7 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
     timerCardItems: [
       language === 'zh-hk' ? '<strong>計時器顯示:</strong> 以 HH:MM:SS 格式顯示剩餘時間。剩餘時間少於或等於5分鐘時變為紅色。如果計時器未運行，您可以點擊時間顯示打開編輯彈窗來修改剩餘時間。' : '<strong>Timer Display:</strong> Shows remaining time in HH:MM:SS format. Turns red when 5 minutes or less remain. If the timer is not running, you can click the time display to open an edit modal to modify the time.',
       language === 'zh-hk' ? '<strong> +/- 按鈕:</strong> 在時間顯示旁邊，用於快速增加或減少1分鐘。這些按鈕在計時器停止時可用。' : '<strong> +/- Buttons:</strong> Next to the time display for quick +/- 1 minute adjustments. These are available when the timer is stopped.',
-      language === 'zh-hk' ? '<strong>進度條:</strong> 已用時間的視覺化表示。' : '<strong>Progress Bar:</strong> Visual representation of time elapsed.',
+      // language === 'zh-hk' ? '<strong>進度條:</strong> 已用時間的視覺化表示。' : '<strong>Progress Bar:</strong> Visual representation of time elapsed.', // Removed
       language === 'zh-hk' ? '<strong>開始/停止/重設:</strong> 控制計時器。重設操作是即時的。' : '<strong>Start/Stop/Reset:</strong> Control the timer. Reset is immediate.',
     ],
     dataPersistenceTitle: language === 'zh-hk' ? '資料持久化' : 'Data Persistence',
@@ -108,3 +108,4 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
     </Dialog>
   );
 }
+
