@@ -13,7 +13,7 @@ interface ExamInfoCardProps {
 
 export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   const T = {
-    cardTitle: language === 'zh-hk' ? '考試資訊' : 'Exam Information',
+    cardTitle: language === 'zh-hk' ? '考試資訊' : 'Examination Information',
     centreNameLabel: language === 'zh-hk' ? '試場：' : 'Centre Name:',
     centreNumberLabel: language === 'zh-hk' ? '試場編號：' : 'Centre Number:',
     subjectLabel: language === 'zh-hk' ? '科目：' : 'Subject:',
@@ -21,14 +21,26 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
     durationLabel: language === 'zh-hk' ? '時長：' : 'Duration:',
     startTimeLabel: language === 'zh-hk' ? '開始時間：' : 'Start Time:',
     endTimeLabel: language === 'zh-hk' ? '結束時間：' : 'End Time:',
-    examLanguageLabel: language === 'zh-hk' ? '應考語言:' : 'Exam Language:',
+    examLanguageLabel: language === 'zh-hk' ? '應考語言：' : 'Exam Language:',
     langEn: language === 'zh-hk' ? '英文' : 'English',
     langZhHk: language === 'zh-hk' ? '中文' : 'Chinese',
   };
 
   const displayDuration = formatDurationFromMinutes(examDetails.durationMinutes, language);
-  const displayExamLanguage = examDetails.examLanguage === 'en' ? T.langEn : 
-                              examDetails.examLanguage === 'zh-hk' ? T.langZhHk : (language === 'zh-hk' ? '不適用' : 'N/A');
+  
+  let displayExamLanguage = language === 'zh-hk' ? '不適用' : 'N/A';
+  if (examDetails.examLanguage === 'en') {
+    displayExamLanguage = T.langEn;
+  } else if (examDetails.examLanguage === 'zh-hk') {
+    displayExamLanguage = T.langZhHk;
+  }
+
+  // Use localized versions for display if app language matches exam setup language or if app language is Chinese
+  const displayCentreName = language === 'zh-hk' && examDetails.centreName === "香城中學" ? "香城中學" : (examDetails.centreName || (language === 'zh-hk' ? '不適用' : 'N/A'));
+  const displayCentreNumber = examDetails.centreNumber || (language === 'zh-hk' ? '不適用' : 'N/A');
+  const displaySubject = language === 'zh-hk' && examDetails.subject === "中國語文" ? "中國語文" : (examDetails.subject || (language === 'zh-hk' ? '不適用' : 'N/A'));
+  const displayPaper = language === 'zh-hk' && examDetails.paper === "試卷一" ? "試卷一" : (examDetails.paper || (language === 'zh-hk' ? '不適用' : 'N/A'));
+
 
   return (
     <Card className="h-full flex flex-col">
@@ -40,19 +52,19 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 text-sm md:text-base pr-4">
             <div>
               <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
-              <p className="text-muted-foreground">{examDetails.centreName || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+              <p className="text-muted-foreground">{displayCentreName}</p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
-              <p className="text-muted-foreground">{examDetails.centreNumber || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+              <p className="text-muted-foreground">{displayCentreNumber}</p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
-              <p className="text-muted-foreground">{examDetails.subject || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+              <p className="text-muted-foreground">{displaySubject}</p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
-              <p className="text-muted-foreground">{examDetails.paper || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+              <p className="text-muted-foreground">{displayPaper}</p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
@@ -66,7 +78,7 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
               <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
               <p className="text-muted-foreground">{examDetails.examEndTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
             </div>
-            <div>
+             <div>
               <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
               <p className="text-muted-foreground">{displayExamLanguage}</p>
             </div>

@@ -11,8 +11,8 @@ import '@fontsource/inter/900.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Exam Info / 考試資訊',
-  description: 'Exam Info and Timer / 考試資訊及計時器',
+  title: 'Examination Information / 考試資訊',
+  description: 'Examination Information and Timer / 考試資訊及計時器',
   manifest: '/manifest.json', 
   themeColor: '#0ea5e9', 
 };

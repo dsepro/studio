@@ -24,15 +24,15 @@ export interface ExamDetails {
 }
 
 const initialExamDetails: ExamDetails = {
-  title: "中國語文 試卷一", 
-  centreName: "香城中學",
+  title: "Chinese Language Paper 1", 
+  centreName: "ABC Secondary School", // Default to English version for base
   centreNumber: "A1234",
-  subject: "中國語文",
-  paper: "試卷一",
+  subject: "Chinese Language", // Default to English version for base
+  paper: "Paper 1", // Default to English version for base
   durationMinutes: 90,
   examStartTime: "08:30",
   examEndTime: "10:00",
-  examLanguage: 'zh-hk',
+  examLanguage: 'zh-hk', // Exam language is Chinese
 };
 
 
@@ -64,7 +64,8 @@ export default function Home() {
   }, []);
 
   const appFooterCreator = language === 'zh-hk' ? '由鍾永老師製作' : 'Created by Mr. Louis Chung';
-  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Exam Info';
+  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Examination Information';
+  const currentYear = new Date().getFullYear();
 
 
   return (
@@ -75,15 +76,15 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <h1 className="text-xl font-semibold hidden sm:block">{appTitle}</h1>
             </div>
-            <div className="flex items-center space-x-3">
-              <HeaderActions
+            <div className="flex items-center space-x-1 md:space-x-2">
+               <HeaderActions
                 onOpenUserManual={() => setIsUserManualOpen(true)}
                 onOpenExamSetup={() => setIsExamSetupOpen(true)}
                 fontScale={fontScale}
                 onFontScaleChange={setFontScale}
                 currentLanguage={language}
                 onLanguageChange={setLanguage}
-                language={language} 
+                language={language}
               />
             </div>
           </div>
@@ -106,7 +107,8 @@ export default function Home() {
       </main>
 
       <footer className="py-4 text-center text-xs text-muted-foreground border-t">
-        {appFooterCreator}
+        {appFooterCreator} <br />
+        © {currentYear} {language === 'zh-hk' ? '考試資訊' : 'Examination Information'}
       </footer>
 
       <UserManualModal isOpen={isUserManualOpen} onClose={() => setIsUserManualOpen(false)} language={language} />
