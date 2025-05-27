@@ -23,7 +23,7 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
     endTimeLabel: language === 'zh-hk' ? '結束時間：' : 'End Time:',
     examLanguageLabel: language === 'zh-hk' ? '應考語言:' : 'Exam Language:',
     langEn: language === 'zh-hk' ? '英文' : 'English',
-    langZhHk: language === 'zh-hk' ? '中文（香港）' : 'Chinese (Hong Kong)',
+    langZhHk: language === 'zh-hk' ? '中文' : 'Chinese',
   };
 
   const displayDuration = formatDurationFromMinutes(examDetails.durationMinutes, language);
@@ -40,19 +40,19 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.centreName || 'N/A'}</p>
+                <p className="text-muted-foreground">{examDetails.centreName || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.centreNumber || 'N/A'}</p>
+                <p className="text-muted-foreground">{examDetails.centreNumber || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.subject || 'N/A'}</p>
+                <p className="text-muted-foreground">{examDetails.subject || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.paper || 'N/A'}</p>
+                <p className="text-muted-foreground">{examDetails.paper || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
@@ -60,11 +60,11 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.examStartTime || 'N/A'}</p>
+                <p className="text-muted-foreground">{examDetails.examStartTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.examEndTime || 'N/A'}</p>
+                <p className="text-muted-foreground">{examDetails.examEndTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
@@ -77,5 +77,3 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
     </Card>
   );
 }
-
-    
