@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Icons } from '@/components/icons'; // Import Icons
 
 interface TimeEditModalProps {
   isOpen: boolean;
@@ -61,6 +62,26 @@ export function TimeEditModal({
     saveButton: language === 'zh-hk' ? '儲存' : 'Save',
   };
 
+  const adjustTime = useCallback((unit: 'h' | 'm' | 's', amount: number) => {
+    if (unit === 'h') {
+      setHours(prev => Math.max(0, prev + amount));
+    } else if (unit === 'm') {
+      setMinutes(prev => {
+        const newM = prev + amount;
+        if (newM > 59) return 59;
+        if (newM < 0) return 0;
+        return newM;
+      });
+    } else if (unit === 's') {
+      setSeconds(prev => {
+        const newS = prev + amount;
+        if (newS > 59) return 59;
+        if (newS < 0) return 0;
+        return newS;
+      });
+    }
+  }, []);
+
   if (!isOpen) return null;
 
   return (
@@ -70,47 +91,76 @@ export function TimeEditModal({
           <DialogTitle>{T.modalTitle}</DialogTitle>
           <DialogDescription>{T.modalDescription}</DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-3 gap-4 py-4">
-          <div>
-            <Label htmlFor="hours" className="text-right">
+        <div className="grid grid-cols-3 gap-x-2 gap-y-4 py-4">
+          {/* Hours */}
+          <div className="flex flex-col items-center space-y-1">
+            <Label htmlFor="hours" className="text-sm">
               {T.hoursLabel}
             </Label>
-            <Input
-              id="hours"
-              type="number"
-              value={hours}
-              onChange={(e) => setHours(Math.max(0, parseInt(e.target.value, 10) || 0))}
-              className="col-span-2 h-10 text-center"
-              min="0"
-            />
+            <div className="flex items-center space-x-1">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => adjustTime('h', -1)}>
+                <Icons.Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                id="hours"
+                type="number"
+                value={hours}
+                onChange={(e) => setHours(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                className="h-10 w-16 text-center px-1"
+                min="0"
+              />
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => adjustTime('h', 1)}>
+                <Icons.Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="minutes" className="text-right">
+
+          {/* Minutes */}
+          <div className="flex flex-col items-center space-y-1">
+            <Label htmlFor="minutes" className="text-sm">
               {T.minutesLabel}
             </Label>
-            <Input
-              id="minutes"
-              type="number"
-              value={minutes}
-              onChange={(e) => setMinutes(Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)))}
-              className="col-span-2 h-10 text-center"
-              min="0"
-              max="59"
-            />
+            <div className="flex items-center space-x-1">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => adjustTime('m', -1)}>
+                <Icons.Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                id="minutes"
+                type="number"
+                value={minutes}
+                onChange={(e) => setMinutes(Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)))}
+                className="h-10 w-16 text-center px-1"
+                min="0"
+                max="59"
+              />
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => adjustTime('m', 1)}>
+                <Icons.Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="seconds" className="text-right">
+
+          {/* Seconds */}
+          <div className="flex flex-col items-center space-y-1">
+            <Label htmlFor="seconds" className="text-sm">
               {T.secondsLabel}
             </Label>
-            <Input
-              id="seconds"
-              type="number"
-              value={seconds}
-              onChange={(e) => setSeconds(Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)))}
-              className="col-span-2 h-10 text-center"
-              min="0"
-              max="59"
-            />
+            <div className="flex items-center space-x-1">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => adjustTime('s', -1)}>
+                <Icons.Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                id="seconds"
+                type="number"
+                value={seconds}
+                onChange={(e) => setSeconds(Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)))}
+                className="h-10 w-16 text-center px-1"
+                min="0"
+                max="59"
+              />
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => adjustTime('s', 1)}>
+                <Icons.Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
         <DialogFooter>
