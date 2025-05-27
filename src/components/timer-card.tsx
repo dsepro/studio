@@ -73,9 +73,8 @@ export function TimerCard({
     if (isRunning) return;
     setTimeLeft(prevTime => {
       const newTime = prevTime + (amount * 60);
-      // Allow adjustment up to a reasonable maximum (e.g., 24 hours more than initial, or current time if it's already higher)
       const maxAllowed = Math.max(initialTotalSeconds, prevTime) + (24 * 3600);
-      return Math.max(0, Math.min(newTime, maxAllowed)); // Prevent negative time and excessive positive time
+      return Math.max(0, Math.min(newTime, maxAllowed));
     });
   };
 
@@ -87,14 +86,11 @@ export function TimerCard({
 
   const handleSaveEditedTime = (newTimeInSeconds: number) => {
     setTimeLeft(newTimeInSeconds);
-    // If the edited time is greater than the original initial duration,
-    // update the initial duration as well, so "Reset" goes to this new baseline.
     if (newTimeInSeconds > initialTotalSeconds) {
         setInitialTotalSeconds(newTimeInSeconds);
     }
   };
 
-  // Calculate a reasonable maximum time for the modal, e.g., 10 hours more than current or initial.
   const maxTimeForModal = Math.max(initialTotalSeconds, timeLeft) + (10 * 3600);
 
 
@@ -117,7 +113,7 @@ export function TimerCard({
               <Icons.Minus className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
             <div
-              className="text-7xl sm:text-8xl md:text-9xl font-mono font-black tabular-nums select-none flex-shrink min-w-0"
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-mono font-black tabular-nums select-none flex-shrink min-w-0"
               style={{
                 color: 'hsl(var(--foreground))',
                 cursor: isRunning ? 'default' : 'pointer'
