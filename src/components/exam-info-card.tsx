@@ -14,14 +14,14 @@ interface ExamInfoCardProps {
 export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   const T = {
     cardTitle: language === 'zh-hk' ? '考試資訊' : 'Exam Information',
-    centreNameLabel: language === 'zh-hk' ? '考埸名稱:' : 'Centre Name:',
-    centreNumberLabel: language === 'zh-hk' ? '考埸編號:' : 'Centre Number:',
-    subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
-    paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
-    durationLabel: language === 'zh-hk' ? '考試時長:' : 'Duration:',
-    startTimeLabel: language === 'zh-hk' ? '開始時間:' : 'Start Time:',
-    endTimeLabel: language === 'zh-hk' ? '結束時間:' : 'End Time:',
-    examLanguageLabel: language === 'zh-hk' ? '試卷語言:' : 'Exam Language:',
+    centreNameLabel: language === 'zh-hk' ? '試場：' : 'Centre Name:',
+    centreNumberLabel: language === 'zh-hk' ? '試場編號：' : 'Centre Number:',
+    subjectLabel: language === 'zh-hk' ? '科目：' : 'Subject:',
+    paperLabel: language === 'zh-hk' ? '試卷：' : 'Paper:',
+    durationLabel: language === 'zh-hk' ? '時長：' : 'Duration:',
+    startTimeLabel: language === 'zh-hk' ? '開始時間：' : 'Start Time:',
+    endTimeLabel: language === 'zh-hk' ? '結束時間：' : 'End Time:',
+    examLanguageLabel: language === 'zh-hk' ? '應考語言:' : 'Exam Language:',
     langEn: language === 'zh-hk' ? '英文' : 'English',
     langZhHk: language === 'zh-hk' ? '中文（香港）' : 'Chinese (Hong Kong)',
   };
@@ -39,6 +39,14 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
           <div className="space-y-6 text-sm md:text-base pr-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               <div>
+                <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.centreName || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.centreNumber || 'N/A'}</p>
+              </div>
+              <div>
                 <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
                 <p className="text-muted-foreground">{examDetails.subject || 'N/A'}</p>
               </div>
@@ -49,14 +57,6 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
                 <p className="text-muted-foreground">{displayDuration}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.centreName || 'N/A'}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.centreNumber || 'N/A'}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
