@@ -27,7 +27,8 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   };
 
   const displayDuration = formatDurationFromMinutes(examDetails.durationMinutes, language);
-  const displayExamLanguage = examDetails.examLanguage === 'en' ? T.langEn : T.langZhHk;
+  const displayExamLanguage = examDetails.examLanguage === 'en' ? T.langEn : 
+                              examDetails.examLanguage === 'zh-hk' ? T.langZhHk : (language === 'zh-hk' ? '不適用' : 'N/A');
 
   return (
     <Card className="h-full flex flex-col">
@@ -36,40 +37,38 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
       </CardHeader>
       <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
         <ScrollArea className="h-full">
-          <div className="space-y-6 text-sm md:text-base pr-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.centreName || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.centreNumber || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.subject || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.paper || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
-                <p className="text-muted-foreground">{displayDuration}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.examStartTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.examEndTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
-                <p className="text-muted-foreground">{displayExamLanguage}</p>
-              </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 text-sm md:text-base pr-4">
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
+              <p className="text-muted-foreground">{examDetails.centreName || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
+              <p className="text-muted-foreground">{examDetails.centreNumber || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
+              <p className="text-muted-foreground">{examDetails.subject || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
+              <p className="text-muted-foreground">{examDetails.paper || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
+              <p className="text-muted-foreground">{displayDuration}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
+              <p className="text-muted-foreground">{examDetails.examStartTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
+              <p className="text-muted-foreground">{examDetails.examEndTime || (language === 'zh-hk' ? '不適用' : 'N/A')}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
+              <p className="text-muted-foreground">{displayExamLanguage}</p>
             </div>
           </div>
         </ScrollArea>

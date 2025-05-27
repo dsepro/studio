@@ -4,8 +4,8 @@
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-// import { useToast } from "@/hooks/use-toast"; // Removed as no longer needed for PWA info
 import React, { useState, useEffect, useCallback } from "react";
+import { MainClock } from '@/components/main-clock'; // Import MainClock
 
 interface HeaderActionsProps {
   onOpenUserManual: () => void;
@@ -14,6 +14,7 @@ interface HeaderActionsProps {
   onFontScaleChange: (scale: number) => void;
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
+  language: string; // Add language prop for MainClock
 }
 
 const MIN_FONT_SCALE = 0.8;
@@ -26,10 +27,10 @@ export function HeaderActions({
   fontScale,
   onFontScaleChange,
   currentLanguage,
-  onLanguageChange
+  onLanguageChange,
+  language // Destructure language prop
 }: HeaderActionsProps) {
   const { setTheme, theme } = useTheme();
-  // const { toast } = useToast(); // Removed
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   const availableThemes = ["light", "dark"]; 
@@ -45,7 +46,7 @@ export function HeaderActions({
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
-        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        alert(currentLanguage === 'zh-hk' ? `進入全螢幕模式時發生錯誤：${err.message} (${err.name})` : `Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
       });
     } else {
       if (document.exitFullscreen) {
@@ -88,7 +89,6 @@ export function HeaderActions({
     toggleLanguage: currentLanguage === 'zh-hk' ? `切換語言 (目前為 繁)` : `Toggle language (Currently EN)`,
     toggleFullscreen: currentLanguage === 'zh-hk' ? '切換全螢幕' : 'Toggle fullscreen',
     openUserManual: currentLanguage === 'zh-hk' ? '開啟用戶手冊' : 'Open user manual',
-    // installApp: currentLanguage === 'zh-hk' ? '安裝應用程式 / 離線使用資訊' : 'Install App / Offline Use Info', // Removed
   };
 
   return (
@@ -102,7 +102,6 @@ export function HeaderActions({
         <span className="sr-only">{T.increaseFontSize}</span>
       </Button>
       <span className="sr-only">{T.currentFontSize}</span>
-
 
       <Button variant="outline" size="icon" onClick={cycleTheme} aria-label={T.cycleTheme}>
         {getThemeIcon()}
@@ -124,12 +123,13 @@ export function HeaderActions({
         <span className="sr-only">{T.toggleFullscreen}</span>
       </Button>
 
+      {/* Render MainClock here, before UserManual button */}
+      <MainClock language={language} className="text-sm font-medium" />
+
       <Button variant="outline" size="icon" onClick={onOpenUserManual} aria-label={T.openUserManual}>
         <Icons.BookOpenText className="h-5 w-5" />
         <span className="sr-only">{T.openUserManual}</span>
       </Button>
-
-      {/* Download button removed */}
     </div>
   );
 }
