@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,8 +24,8 @@
     --accent-foreground: 0 0% 100%; /* #ffffff */
     --destructive: 349 89% 60%; /* #f43f5e */
     --destructive-foreground: 0 0% 100%; /* #ffffff */
-    --success: 188 85% 50%; /* #22d3ee */
-    --success-foreground: 222 47% 11%; /* #0f172a */
+    --success: 145 63% 49%; /* #4CAF50 */
+    --success-foreground: 0 0% 100%; /* #ffffff */
     --border: 213 27% 84%; /* #cbd5e1 */
     --input: 215 33% 95%; /* #f1f5f9 */
     --input-foreground: 222 47% 11%; /* #0f172a */
@@ -55,22 +56,22 @@
     --card-foreground: 215 28% 90%; /* #e2e8f0 */
     --popover: 215 39% 17%; /* #1e293b */
     --popover-foreground: 215 28% 90%; /* #e2e8f0 */
-    --primary: 201 93% 60%; /* #38bdf8 */
-    --primary-foreground: 222 47% 11%; /* #0f172a */
+    --primary: 200 90% 50%; /* #0ea5e9 */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
     --secondary: 215 28% 26%; /* #334155 */
     --secondary-foreground: 215 28% 90%; /* #e2e8f0 */
     --muted: 215 28% 26%; /* #334155 */
     --muted-foreground: 216 19% 65%; /* #94a3b8 */
-    --accent: 201 93% 60%; /* #38bdf8 */
-    --accent-foreground: 222 47% 11%; /* #0f172a */
+    --accent: 200 90% 50%; /* #0ea5e9 */
+    --accent-foreground: 0 0% 100%; /* #ffffff */
     --destructive: 349 89% 60%; /* #f43f5e */
-    --destructive-foreground: 215 28% 90%; /* #e2e8f0 */
-    --success: 188 85% 50%; /* #22d3ee */
-    --success-foreground: 222 47% 11%; /* #0f172a */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --success: 145 58% 55%; /* #66BB6A */
+    --success-foreground: 0 0% 0%; /* black */
     --border: 215 28% 26%; /* #334155 */
     --input: 222 47% 11%; /* #0f172a */
     --input-foreground: 215 28% 90%; /* #e2e8f0 */
-    --ring: 201 93% 60%; /* #38bdf8 */
+    --ring: 200 90% 50%; /* #0ea5e9 */
     
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -118,14 +119,9 @@
   }
 }
 
-/* Custom button variants if needed */
-.btn-timer-adjust {
-    @apply bg-secondary text-secondary-foreground hover:bg-muted;
-}
-.dark .btn-timer-adjust {
-    @apply bg-secondary text-secondary-foreground hover:bg-muted;
-}
+/* Removed btn-timer-adjust as specific adjustment buttons were removed from TimerCard */
 
+/* General success button style (can be used if needed, TimerCard now uses primary for Start) */
 .btn-success {
   @apply bg-success text-success-foreground hover:opacity-90;
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +19,7 @@ export function SettingsCard({ fontScale, onFontScaleChange, onOpenExamSetup }: 
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card>
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl">Settings</CardTitle>
       </CardHeader>

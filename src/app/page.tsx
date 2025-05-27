@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -61,7 +62,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <MainClock />
@@ -72,19 +73,15 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-6xl p-4 md:p-6 lg:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-6">
-            <ExamInfoCard examDetails={examDetails} />
-          </div>
-          <div className="md:col-span-1 space-y-6">
-            <TimerCard onOpenConfirmation={handleOpenConfirmation} initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)} />
-            <SettingsCard
-              fontScale={fontScale}
-              onFontScaleChange={setFontScale}
-              onOpenExamSetup={() => setIsExamSetupOpen(true)}
-            />
-          </div>
+      <main className="flex-grow container mx-auto max-w-4xl p-4 md:p-6 lg:p-8">
+        <div className="grid grid-cols-1 gap-6">
+          <TimerCard onOpenConfirmation={handleOpenConfirmation} initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)} />
+          <ExamInfoCard examDetails={examDetails} />
+          <SettingsCard
+            fontScale={fontScale}
+            onFontScaleChange={setFontScale}
+            onOpenExamSetup={() => setIsExamSetupOpen(true)}
+          />
         </div>
       </main>
 
