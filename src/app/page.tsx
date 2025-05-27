@@ -71,7 +71,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl"> {/* Increased width */}
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <MainClock />
@@ -89,7 +89,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8">
+      <main className="flex-grow container mx-auto max-w-3xl p-4 md:p-6 lg:p-8"> {/* Increased width */}
         <div className="grid grid-cols-1 gap-6">
           <TimerCard 
             initialDurationMinutes={examDetails.durationMinutes}
@@ -123,4 +123,3 @@ export default function Home() {
     </div>
   );
 }
-

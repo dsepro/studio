@@ -1,11 +1,10 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-// import { Progress } from "@/components/ui/progress"; // Progress bar removed
 import useLocalStorage from '@/hooks/use-local-storage';
 import { TimeEditModal } from './time-edit-modal'; 
 
@@ -68,7 +67,7 @@ export function TimerCard({ initialDurationMinutes = 90, language }: TimerCardPr
     if (isRunning) return;
     setTimeLeft(prevTime => {
       const newTime = prevTime + (amount * 60);
-      return Math.max(0, Math.min(newTime, initialTotalSeconds > newTime ? initialTotalSeconds : newTime + 360000)); // Cap at initial or allow more
+      return Math.max(0, Math.min(newTime, initialTotalSeconds > newTime ? initialTotalSeconds : newTime + 360000)); 
     });
   };
 
@@ -84,8 +83,6 @@ export function TimerCard({ initialDurationMinutes = 90, language }: TimerCardPr
         setInitialTotalSeconds(newTimeInSeconds);
     }
   };
-
-  // const progressPercentage = initialTotalSeconds > 0 ? (timeLeft / initialTotalSeconds) * 100 : 0; // Progress bar removed
 
   return (
     <>
@@ -127,14 +124,12 @@ export function TimerCard({ initialDurationMinutes = 90, language }: TimerCardPr
               <Icons.Plus className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
           </div>
-
-          {/* <Progress value={progressPercentage} className="w-full max-w-xs sm:max-w-sm h-2.5" /> */} {/* Progress bar removed */}
           
           <div className="flex justify-center space-x-2 sm:space-x-3 w-full max-w-xs sm:max-w-sm pt-2">
             <Button 
               onClick={handleStart} 
               disabled={isRunning || timeLeft === 0} 
-              className="flex-1 text-sm sm:text-base py-2.5 h-auto bg-primary text-primary-foreground hover:bg-primary/90"
+              className="flex-1 text-xs sm:text-sm py-2 h-auto bg-primary text-primary-foreground hover:bg-primary/90"
             >
                {T.start}
             </Button>
@@ -142,14 +137,14 @@ export function TimerCard({ initialDurationMinutes = 90, language }: TimerCardPr
               onClick={handleStop} 
               disabled={!isRunning} 
               variant="secondary" 
-              className="flex-1 text-sm sm:text-base py-2.5 h-auto bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              className="flex-1 text-xs sm:text-sm py-2 h-auto bg-secondary text-secondary-foreground hover:bg-secondary/80"
             >
                {T.stop}
             </Button>
             <Button 
               onClick={handleReset} 
               variant="destructive" 
-              className="flex-1 text-sm sm:text-base py-2.5 h-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="flex-1 text-xs sm:text-sm py-2 h-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
                {T.reset}
             </Button>
@@ -167,4 +162,3 @@ export function TimerCard({ initialDurationMinutes = 90, language }: TimerCardPr
     </>
   );
 }
-

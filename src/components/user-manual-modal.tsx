@@ -35,7 +35,7 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
       language === 'zh-hk' ? '<strong>語言切換 (繁/EN 圖示):</strong> 切換顯示語言 (繁體中文（香港）/英文)。' : '<strong>Language Toggle (繁/EN icon):</strong> Toggle display language (Traditional Chinese (Hong Kong)/English).',
       language === 'zh-hk' ? '<strong>全螢幕切換 (展開/收縮圖示):</strong> 進入或退出全螢幕模式。' : '<strong>Fullscreen Toggle (Expand/Shrink icon):</strong> Enter or exit fullscreen mode.',
       language === 'zh-hk' ? '<strong>用戶手冊 (書本圖示):</strong> 開啟此指南。' : '<strong>User Manual (Book icon):</strong> Opens this guide.',
-      language === 'zh-hk' ? '<strong>安裝應用程式 (下載圖示):</strong> 此應用程式是一個漸進式網絡應用程式 (PWA)。點擊此按鈕會提示資訊，您可以通常透過瀏覽器的選單選項（例如，「安裝應用程式」或「新增至主畫面」）將其安裝到您的裝置上，以便離線使用並獲得類似原生應用程式的體驗。' : '<strong>Install App (Download icon):</strong> This app is a Progressive Web App (PWA). Clicking this gives info, and you can typically install it to your device via your browser\'s menu options (e.g., "Install App" or "Add to Home Screen") for offline use and a native-app-like experience.',
+      // Item for Install App / PWA removed
     ],
     examInfoCardTitle: language === 'zh-hk' ? '考試資訊卡片' : 'Exam Information Card',
     examInfoCardText: language === 'zh-hk' ? '顯示目前配置的考試詳細資訊，例如考試名稱、中心、科目、試卷、時長等。這些資訊可以透過「考試設定」進行配置。' : 'Displays details about the current configured exam, such as title, centre, subject, paper, duration, etc. These can be configured via "Exam Setup".',
@@ -43,7 +43,6 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
     timerCardItems: [
       language === 'zh-hk' ? '<strong>計時器顯示:</strong> 以 HH:MM:SS 格式顯示剩餘時間。剩餘時間少於或等於5分鐘時變為紅色。如果計時器未運行，您可以點擊時間顯示打開編輯彈窗來修改剩餘時間。' : '<strong>Timer Display:</strong> Shows remaining time in HH:MM:SS format. Turns red when 5 minutes or less remain. If the timer is not running, you can click the time display to open an edit modal to modify the time.',
       language === 'zh-hk' ? '<strong> +/- 按鈕:</strong> 在時間顯示旁邊，用於快速增加或減少1分鐘。這些按鈕在計時器停止時可用。' : '<strong> +/- Buttons:</strong> Next to the time display for quick +/- 1 minute adjustments. These are available when the timer is stopped.',
-      // language === 'zh-hk' ? '<strong>進度條:</strong> 已用時間的視覺化表示。' : '<strong>Progress Bar:</strong> Visual representation of time elapsed.', // Removed
       language === 'zh-hk' ? '<strong>開始/停止/重設:</strong> 控制計時器。重設操作是即時的。' : '<strong>Start/Stop/Reset:</strong> Control the timer. Reset is immediate.',
     ],
     dataPersistenceTitle: language === 'zh-hk' ? '資料持久化' : 'Data Persistence',
@@ -108,4 +107,3 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
     </Dialog>
   );
 }
-

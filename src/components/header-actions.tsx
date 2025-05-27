@@ -4,7 +4,7 @@
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast"; // Removed as no longer needed for PWA info
 import React, { useState, useEffect, useCallback } from "react";
 
 interface HeaderActionsProps {
@@ -29,10 +29,10 @@ export function HeaderActions({
   onLanguageChange
 }: HeaderActionsProps) {
   const { setTheme, theme } = useTheme();
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Removed
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const availableThemes = ["light", "dark"]; // Removed "system"
+  const availableThemes = ["light", "dark"]; 
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -63,21 +63,7 @@ export function HeaderActions({
   const toggleLanguage = useCallback(() => {
     const newLanguage = currentLanguage === "en" ? "zh-hk" : "en";
     onLanguageChange(newLanguage);
-    // Removed toast notification
   }, [currentLanguage, onLanguageChange]);
-
-  const handleAppInstallInfo = () => {
-    toast({
-      title: currentLanguage === 'zh-hk' ? "應用程式安裝 (PWA)" : "App Installation (PWA)",
-      description: (
-        <div>
-          <p>{currentLanguage === 'zh-hk' ? "此應用程式是一個漸進式網絡應用程式 (PWA)，可以安裝在您的裝置上。" : "This application is a Progressive Web App (PWA) and can be installed on your device."}</p>
-          <p>{currentLanguage === 'zh-hk' ? "在瀏覽器的選單中查找「安裝」、「新增至主畫面」或類似選項，即可離線使用並獲得類似原生應用程式的體驗。" : "Look for an \"Install,\" \"Add to Home Screen,\" or similar option in your browser's menu to use it offline and like a native app."}</p>
-        </div>
-      ),
-      duration: 10000,
-    });
-  };
 
   const getThemeIcon = () => {
     if (theme === "light") return <Icons.Sun className="h-5 w-5" />;
@@ -102,7 +88,7 @@ export function HeaderActions({
     toggleLanguage: currentLanguage === 'zh-hk' ? `切換語言 (目前為 繁)` : `Toggle language (Currently EN)`,
     toggleFullscreen: currentLanguage === 'zh-hk' ? '切換全螢幕' : 'Toggle fullscreen',
     openUserManual: currentLanguage === 'zh-hk' ? '開啟用戶手冊' : 'Open user manual',
-    installApp: currentLanguage === 'zh-hk' ? '安裝應用程式 / 離線使用資訊' : 'Install App / Offline Use Info',
+    // installApp: currentLanguage === 'zh-hk' ? '安裝應用程式 / 離線使用資訊' : 'Install App / Offline Use Info', // Removed
   };
 
   return (
@@ -143,10 +129,7 @@ export function HeaderActions({
         <span className="sr-only">{T.openUserManual}</span>
       </Button>
 
-      <Button variant="outline" size="icon" onClick={handleAppInstallInfo} aria-label={T.installApp}>
-        <Icons.Download className="h-5 w-5" />
-        <span className="sr-only">{T.installApp}</span>
-      </Button>
+      {/* Download button removed */}
     </div>
   );
 }

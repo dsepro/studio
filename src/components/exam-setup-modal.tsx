@@ -15,14 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import type { ExamDetails } from '@/app/page';
 import { ScrollArea } from './ui/scroll-area';
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast"; // Removed
 
 interface ExamSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentDetails: ExamDetails;
   onSave: (newDetails: ExamDetails) => void;
-  language: string; 
   currentAppLanguage: string; 
 }
 
@@ -38,11 +37,10 @@ export function ExamSetupModal({
   onClose, 
   currentDetails, 
   onSave, 
-  language, 
   currentAppLanguage 
 }: ExamSetupModalProps) {
   const [formState, setFormState] = useState<ExamDetails>(currentDetails);
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Removed
 
   useEffect(() => {
     if (isOpen) {
@@ -95,46 +93,33 @@ export function ExamSetupModal({
     finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper);
 
     if (!finalDetails.title.trim()) {
-      finalDetails.title = language === 'zh-hk' ? '自訂考試' : 'Custom Exam';
+      finalDetails.title = currentAppLanguage === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
     
     onSave(finalDetails);
     onClose();
   };
 
-  const handleDownloadAppInfo = () => {
-    toast({
-      title: language === 'zh-hk' ? "應用程式安裝 (PWA)" : "App Installation (PWA)",
-      description: (
-        <div>
-          <p>{language === 'zh-hk' ? "此應用程式是一個漸進式網絡應用程式 (PWA)，可以安裝在您的裝置上。" : "This application is a Progressive Web App (PWA) and can be installed on your device."}</p>
-          <p>{language === 'zh-hk' ? "在瀏覽器的選單中查找「安裝」、「新增至主畫面」或類似選項，即可離線使用並獲得類似原生應用程式的體驗。" : "Look for an \"Install,\" \"Add to Home Screen,\" or similar option in your browser's menu to use it offline and like a native app."}</p>
-        </div>
-      ),
-      duration: 10000,
-    });
-  };
-
   const T = {
-    modalTitle: language === 'zh-hk' ? '考試設定' : 'Exam Setup',
-    centreInformationTitle: language === 'zh-hk' ? '中心資訊' : 'Centre Information',
-    centreNameLabel: language === 'zh-hk' ? '中心:' : 'Centre:', // Updated
-    centreNumberLabel: language === 'zh-hk' ? '考場:' : 'Venue:', // Updated (考場 also means exam venue, aligning with Centre Number's purpose)
-    examDetailsTitle: language === 'zh-hk' ? '考試詳情' : 'Exam Details',
-    subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
-    paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
-    timingTitle: language === 'zh-hk' ? '時間安排' : 'Timing',
-    durationMinutesLabel: language === 'zh-hk' ? '時長 (分鐘):' : 'Duration (Minutes):',
-    examTimeLabel: language === 'zh-hk' ? '考試時間:' : 'Exam Time:',
-    examStartTimeLabel: language === 'zh-hk' ? '由' : 'From',
-    examEndTimeLabel: language === 'zh-hk' ? '至' : 'To',
-    examLanguageTitle: language === 'zh-hk' ? '試卷語言' : 'Exam Language',
-    languageLabel: language === 'zh-hk' ? '語言:' : 'Language:',
-    langZhHkButton: language === 'zh-hk' ? '中文' : '中文',
-    langEnButton: language === 'zh-hk' ? 'English' : 'English',
-    downloadAppButton: language === 'zh-hk' ? '下載應用程式資訊' : 'App Install Info',
-    cancelButton: language === 'zh-hk' ? '取消' : 'Cancel',
-    confirmAndCloseButton: language === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
+    modalTitle: currentAppLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
+    centreInformationTitle: currentAppLanguage === 'zh-hk' ? '中心資訊' : 'Centre Information',
+    centreNameLabel: currentAppLanguage === 'zh-hk' ? '中心:' : 'Centre:',
+    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考場:' : 'Venue:',
+    examDetailsTitle: currentAppLanguage === 'zh-hk' ? '考試詳情' : 'Exam Details',
+    subjectLabel: currentAppLanguage === 'zh-hk' ? '科目:' : 'Subject:',
+    paperLabel: currentAppLanguage === 'zh-hk' ? '試卷:' : 'Paper:',
+    timingTitle: currentAppLanguage === 'zh-hk' ? '時間安排' : 'Timing',
+    durationMinutesLabel: currentAppLanguage === 'zh-hk' ? '時長 (分鐘):' : 'Duration (Minutes):',
+    examTimeLabel: currentAppLanguage === 'zh-hk' ? '考試時間:' : 'Exam Time:',
+    examStartTimeLabel: currentAppLanguage === 'zh-hk' ? '由' : 'From',
+    examEndTimeLabel: currentAppLanguage === 'zh-hk' ? '至' : 'To',
+    examLanguageTitle: currentAppLanguage === 'zh-hk' ? '試卷語言' : 'Exam Language',
+    languageLabel: currentAppLanguage === 'zh-hk' ? '語言:' : 'Language:',
+    langZhHkButton: currentAppLanguage === 'zh-hk' ? '中文' : '中文',
+    langEnButton: currentAppLanguage === 'zh-hk' ? 'English' : 'English',
+    // downloadAppButton: currentAppLanguage === 'zh-hk' ? '下載應用程式資訊' : 'App Install Info', // Removed
+    cancelButton: currentAppLanguage === 'zh-hk' ? '取消' : 'Cancel',
+    confirmAndCloseButton: currentAppLanguage === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
   };
 
   if (!isOpen) return null;
@@ -177,7 +162,7 @@ export function ExamSetupModal({
               <div>
                 <Label htmlFor="durationMinutes" className="text-foreground/90">{T.durationMinutesLabel}</Label>
                 <div className="flex items-center space-x-2 mt-1">
-                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => adjustDuration(-1)} aria-label={language === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
+                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => adjustDuration(-1)} aria-label={currentAppLanguage === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
                     <Icons.Minus className="h-4 w-4" />
                   </Button>
                   <Input 
@@ -189,7 +174,7 @@ export function ExamSetupModal({
                     className="bg-input text-input-foreground border-border text-center flex-1 h-10" 
                     min="0" 
                   />
-                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => adjustDuration(1)} aria-label={language === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
+                  <Button variant="outline" size="icon" className="h-10 w-10" onClick={() => adjustDuration(1)} aria-label={currentAppLanguage === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
                     <Icons.Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -226,11 +211,9 @@ export function ExamSetupModal({
             </div>
           </div>
         </ScrollArea>
-        <DialogFooter className="flex-col sm:flex-row sm:justify-between pt-4">
-          <Button variant="outline" onClick={handleDownloadAppInfo} className="w-full sm:w-auto">
-            <Icons.Download className="mr-2 h-4 w-4" /> {T.downloadAppButton}
-          </Button>
-          <div className="flex space-x-2 w-full sm:w-auto justify-end">
+        <DialogFooter className="flex-col sm:flex-row sm:justify-end pt-4">
+          {/* Download App button removed from here */}
+          <div className="flex space-x-2 w-full sm:w-auto">
             <Button variant="outline" onClick={onClose}>{T.cancelButton}</Button>
             <Button onClick={handleSave}>{T.confirmAndCloseButton}</Button>
           </div>
@@ -239,5 +222,3 @@ export function ExamSetupModal({
     </Dialog>
   );
 }
-
-    
