@@ -21,7 +21,7 @@ interface ExamSetupModalProps {
   onClose: () => void;
   currentDetails: ExamDetails;
   onSave: (newDetails: ExamDetails) => void;
-  currentAppLanguage: string; 
+  currentAppLanguage: string;
 }
 
 const deriveTitle = (subject: string, paper: string, lang: string): string => {
@@ -46,12 +46,12 @@ const calculateEndTime = (startTime: string, durationMinutes: number): string =>
   return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
 };
 
-export function ExamSetupModal({ 
-  isOpen, 
-  onClose, 
-  currentDetails, 
-  onSave, 
-  currentAppLanguage 
+export function ExamSetupModal({
+  isOpen,
+  onClose,
+  currentDetails,
+  onSave,
+  currentAppLanguage,
 }: ExamSetupModalProps) {
   const [formState, setFormState] = useState<ExamDetails>(currentDetails);
 
@@ -77,7 +77,7 @@ export function ExamSetupModal({
     }
   }, [currentDetails, isOpen, currentAppLanguage]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
     setFormState(prevFormState => {
@@ -86,22 +86,17 @@ export function ExamSetupModal({
       let newSubject = prevFormState.subject;
       let newPaper = prevFormState.paper;
 
-      const updatedFormState = { ...prevFormState };
+      const updatedFormState = { ...prevFormState, [name as keyof ExamDetails]: value as any };
 
       if (name === "durationMinutes") {
         newDuration = Math.max(0, parseInt(value, 10) || 0);
         updatedFormState.durationMinutes = newDuration;
       } else if (name === "examStartTime") {
         newStartTime = value;
-        updatedFormState.examStartTime = newStartTime;
       } else if (name === "subject"){
         newSubject = value;
-        updatedFormState.subject = newSubject;
       } else if (name === "paper"){
         newPaper = value;
-        updatedFormState.paper = newPaper;
-      } else {
-        updatedFormState[name as keyof ExamDetails] = value as any;
       }
       
       if (name === "subject" || name === "paper") {
@@ -123,6 +118,7 @@ export function ExamSetupModal({
       return {
         ...prev,
         durationMinutes: newDuration,
+        title: deriveTitle(prev.subject, prev.paper, currentAppLanguage), // ensure title updates if logic depends on duration indirectly
         examEndTime: newEndTime,
       };
     });
@@ -135,13 +131,10 @@ export function ExamSetupModal({
   const handleSave = () => {
     let finalDetails = { ...formState };
     
-    // Ensure title is derived if it became empty or if subject/paper changed
     finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper, currentAppLanguage);
     if (!finalDetails.title.trim()) {
       finalDetails.title = currentAppLanguage === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
-
-    // Ensure end time is calculated
     finalDetails.examEndTime = calculateEndTime(finalDetails.examStartTime, finalDetails.durationMinutes);
     
     onSave(finalDetails);
@@ -151,8 +144,8 @@ export function ExamSetupModal({
   const T = {
     modalTitle: currentAppLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
     centreInformationTitle: currentAppLanguage === 'zh-hk' ? '中心資訊' : 'Centre Information',
-    centreNameLabel: currentAppLanguage === 'zh-hk' ? '中心:' : 'Centre:',
-    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考場:' : 'Venue:',
+    centreNameLabel: currentAppLanguage === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
+    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考埸:' : 'Centre Number:',
     examDetailsTitle: currentAppLanguage === 'zh-hk' ? '考試詳情' : 'Exam Details',
     subjectLabel: currentAppLanguage === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: currentAppLanguage === 'zh-hk' ? '試卷:' : 'Paper:',
@@ -231,7 +224,7 @@ export function ExamSetupModal({
                 <div className="flex items-center space-x-2 mt-1">
                   <Input id="examStartTime" name="examStartTime" type="time" value={formState.examStartTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border" aria-label={T.examStartTimeLabel} />
                   <span>-</span>
-                  <Input id="examEndTime" name="examEndTime" type="time" value={formState.examEndTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border" aria-label={T.examEndTimeLabel}/>
+                  <Input id="examEndTime" name="examEndTime" type="time" value={formState.examEndTime} readOnly className="bg-input text-input-foreground border-border" aria-label={T.examEndTimeLabel}/>
                 </div>
               </div>
             </div>
