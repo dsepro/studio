@@ -31,7 +31,7 @@ const initialExamDetails: ExamDetails = {
   paper: "Paper 1",   
   durationMinutes: 90, 
   examStartTime: "08:30",
-  examEndTime: "10:00", // 08:30 + 90 minutes
+  examEndTime: "10:00",
   examLanguage: 'en',
 };
 
@@ -39,7 +39,7 @@ const initialExamDetails: ExamDetails = {
 export default function Home() {
   const [fontScale, setFontScale] = useLocalStorage<number>('fontScale', 1);
   const [examDetails, setExamDetails] = useLocalStorage<ExamDetails>('examDetails', initialExamDetails);
-  const [language, setLanguage] = useLocalStorage<string>('language', 'en'); // 'en' or 'zh-hk'
+  const [language, setLanguage] = useLocalStorage<string>('language', 'en'); 
 
   const [isUserManualOpen, setIsUserManualOpen] = useState(false);
   const [isExamSetupOpen, setIsExamSetupOpen] = useState(false);
@@ -88,14 +88,18 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-3xl p-4 md:p-6 lg:p-8">
-        <div className="grid grid-cols-1 gap-6">
-          <TimerCard 
-            initialDurationMinutes={examDetails.durationMinutes}
-            language={language}
-            onOpenConfirmation={handleOpenConfirmation}
-          />
-          <ExamInfoCard examDetails={examDetails} language={language} />
+      <main className="flex-grow flex flex-col container mx-auto max-w-5xl p-4 md:p-6 lg:p-8 w-full">
+        <div className="flex flex-col gap-6 flex-grow">
+          <div className="flex-[2_2_0%] min-h-0"> {/* TimerCard wrapper */}
+            <TimerCard 
+              initialDurationMinutes={examDetails.durationMinutes}
+              language={language}
+              onOpenConfirmation={handleOpenConfirmation}
+            />
+          </div>
+          <div className="flex-[1_1_0%] min-h-0"> {/* ExamInfoCard wrapper */}
+            <ExamInfoCard examDetails={examDetails} language={language} />
+          </div>
         </div>
       </main>
 

@@ -2,12 +2,13 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ExamDetails } from '@/app/page'; 
-import { formatDurationFromMinutes } from "@/lib/utils"; // Updated import
+import { formatDurationFromMinutes } from "@/lib/utils";
 
 interface ExamInfoCardProps {
   examDetails: ExamDetails;
-  language: string; // App display language
+  language: string; 
 }
 
 export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
@@ -15,7 +16,7 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
     cardTitle: language === 'zh-hk' ? '考試資訊' : 'Exam Information',
     examTitleLabel: language === 'zh-hk' ? '考試名稱:' : 'Exam Title:',
     centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
-    centreNumberLabel: language === 'zh-hk' ? '中心編號:' : 'Centre Number:',
+    centreNumberLabel: language === 'zh-hk' ? '考埸:' : 'Centre Number:',
     subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
     durationLabel: language === 'zh-hk' ? '考試時長:' : 'Duration:',
@@ -30,49 +31,53 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   const displayExamLanguage = examDetails.examLanguage === 'en' ? T.langEn : T.langZhHk;
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl">{T.cardTitle}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6 text-sm md:text-base">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.examTitleLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.title || 'N/A'}</p>
+      <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
+        <ScrollArea className="h-full">
+          <div className="space-y-6 text-sm md:text-base pr-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.examTitleLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.title || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.subject || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.paper || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
+                <p className="text-muted-foreground">{displayDuration}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.centreName || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.centreNumber || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.examStartTime || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
+                <p className="text-muted-foreground">{examDetails.examEndTime || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
+                <p className="text-muted-foreground">{displayExamLanguage}</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.subject || 'N/A'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.paper || 'N/A'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
-            <p className="text-muted-foreground">{displayDuration}</p>
-          </div>
-           <div>
-            <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.centreName || 'N/A'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.centreNumber || 'N/A'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.examStartTime || 'N/A'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.examEndTime || 'N/A'}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
-            <p className="text-muted-foreground">{displayExamLanguage}</p>
-          </div>
-        </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
