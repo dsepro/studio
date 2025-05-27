@@ -24,7 +24,7 @@ export interface ExamDetails {
 }
 
 const initialExamDetails: ExamDetails = {
-  title: "中國語文 試卷一", 
+  title: "中國語文 試卷一",
   centreName: "香城中學",
   centreNumber: "A1234",
   subject: "中國語文",
@@ -64,15 +64,13 @@ export default function Home() {
   }, []);
 
   const appFooterCreator = language === 'zh-hk' ? '由鍾永老師製作' : 'Created by Mr. Louis Chung';
-  const currentYear = new Date().getFullYear();
-
+  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Examination Information';
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
-          <div className="flex items-center justify-end h-16"> {/* Changed justify-between to justify-end */}
-            {/* App title removed from here */}
+          <div className="flex items-center justify-end h-16">
             <div className="flex items-center space-x-1 md:space-x-2">
                <HeaderActions
                 onOpenUserManual={() => setIsUserManualOpen(true)}
@@ -81,7 +79,7 @@ export default function Home() {
                 onFontScaleChange={setFontScale}
                 currentLanguage={language}
                 onLanguageChange={setLanguage}
-                language={language} 
+                language={language}
               />
             </div>
           </div>
@@ -98,7 +96,11 @@ export default function Home() {
             />
           </div>
           <div className="flex-[1_1_0%] min-h-0">
-            <ExamInfoCard examDetails={examDetails} language={language} />
+            <ExamInfoCard
+              key={`exam-info-${language}`} 
+              examDetails={examDetails}
+              language={language}
+            />
           </div>
         </div>
       </main>
@@ -112,7 +114,11 @@ export default function Home() {
         isOpen={isExamSetupOpen}
         onClose={() => setIsExamSetupOpen(false)}
         currentDetails={examDetails}
-        onSave={(newDetails) => setExamDetails(newDetails)}
+        onSave={(newDetails) => {
+          setExamDetails(newDetails);
+          // If the timer is not running, update its duration to match new exam details
+          // This assumes TimerCard will pick up new initialDurationMinutes if it's not running
+        }}
         currentAppLanguage={language}
       />
       <ConfirmationDialog
