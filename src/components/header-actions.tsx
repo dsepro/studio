@@ -5,19 +5,13 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 interface HeaderActionsProps {
   onOpenUserManual: () => void;
@@ -32,7 +26,7 @@ export function HeaderActions({
   fontScale,
   onFontScaleChange 
 }: HeaderActionsProps) {
-  const { setTheme, theme } = useTheme();
+  const { setTheme, theme, themes } = useTheme();
   const { toast } = useToast();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState("EN"); // Placeholder
@@ -57,10 +51,21 @@ export function HeaderActions({
     }
   };
 
-  const toggleLanguage = (lang: string) => {
-    setCurrentLanguage(lang);
+  const cycleTheme = useCallback(() => {
+    const currentThemeIndex = themes.indexOf(theme || 'system');
+    const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+    setTheme(themes[nextThemeIndex]);
+  }, [theme, themes, setTheme]);
+
+  const toggleLanguage = useCallback(() => {
+    setCurrentLanguage(prev => (prev === "EN" ? "ZH" : "EN"));
     // Add actual language change logic here if needed
-  };
+    toast({
+      title: "Language Switched",
+      description: `Language set to ${currentLanguage === "EN" ? "Chinese (Placeholder)" : "English"}.`,
+      duration: 2000,
+    })
+  }, [currentLanguage, toast]);
 
   const handleFontScaleSliderChange = (value: number[]) => {
     onFontScaleChange(value[0]);
@@ -77,6 +82,12 @@ export function HeaderActions({
       ),
       duration: 10000, // Show for 10 seconds
     });
+  };
+
+  const getThemeIcon = () => {
+    if (theme === "light") return <Icons.Sun className="h-5 w-5" />;
+    if (theme === "dark") return <Icons.Moon className="h-5 w-5" />;
+    return <Icons.Laptop className="h-5 w-5" />; // System theme
   };
 
   return (
@@ -108,52 +119,20 @@ export function HeaderActions({
         </PopoverContent>
       </Popover>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            {theme === "light" ? <Icons.Sun className="h-5 w-5" /> : <Icons.Moon className="h-5 w-5" />}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme("light")}>
-            <Icons.Sun className="mr-2 h-4 w-4" />
-            Light
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")}>
-            <Icons.Moon className="mr-2 h-4 w-4" />
-            Dark
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("system")}>
-            <Icons.Laptop className="mr-2 h-4 w-4" />
-            System
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button variant="outline" size="icon" onClick={cycleTheme} aria-label="Cycle theme">
+        {getThemeIcon()}
+        <span className="sr-only">Cycle theme (Currently {theme})</span>
+      </Button>
 
       <Button variant="outline" size="icon" onClick={onOpenExamSetup}>
         <Icons.Settings2 className="h-5 w-5" />
         <span className="sr-only">Exam Setup</span>
       </Button>
       
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            <Icons.Languages className="h-5 w-5" />
-            <span className="sr-only">Change language</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => toggleLanguage("EN")}>
-            {currentLanguage === "EN" && <Icons.Check className="mr-2 h-4 w-4" />}
-            English
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => toggleLanguage("ZH")}>
-            {currentLanguage === "ZH" && <Icons.Check className="mr-2 h-4 w-4" />}
-            中文 (Placeholder)
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button variant="outline" size="icon" onClick={toggleLanguage} aria-label="Toggle language">
+        <Icons.Languages className="h-5 w-5" />
+        <span className="sr-only">Toggle language (Currently {currentLanguage})</span>
+      </Button>
 
       <Button variant="outline" size="icon" onClick={toggleFullScreen}>
         {isFullScreen ? <Icons.Shrink className="h-5 w-5" /> : <Icons.Expand className="h-5 w-5" />}
