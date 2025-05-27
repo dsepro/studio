@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -19,6 +20,7 @@ interface ConfirmationDialogProps {
   description: string;
   confirmText?: string;
   cancelText?: string;
+  language?: string; // Added language prop
 }
 
 export function ConfirmationDialog({
@@ -27,10 +29,16 @@ export function ConfirmationDialog({
   onConfirm,
   title,
   description,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText,
+  cancelText,
+  language = 'en', // Default to English
 }: ConfirmationDialogProps) {
   if (!isOpen) return null;
+
+  const T = {
+    defaultConfirmText: language === 'zh' ? '确认' : 'Confirm',
+    defaultCancelText: language === 'zh' ? '取消' : 'Cancel',
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -40,9 +48,9 @@ export function ConfirmationDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>{cancelText}</AlertDialogCancel>
+          <AlertDialogCancel onClick={onClose}>{cancelText || T.defaultCancelText}</AlertDialogCancel>
           <AlertDialogAction onClick={() => { onConfirm(); onClose(); }}>
-            {confirmText}
+            {confirmText || T.defaultConfirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

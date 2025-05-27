@@ -18,18 +18,21 @@ interface HeaderActionsProps {
   onOpenExamSetup: () => void;
   fontScale: number;
   onFontScaleChange: (scale: number) => void;
+  currentLanguage: string;
+  onLanguageChange: (language: string) => void;
 }
 
 export function HeaderActions({ 
   onOpenUserManual, 
   onOpenExamSetup,
   fontScale,
-  onFontScaleChange 
+  onFontScaleChange,
+  currentLanguage,
+  onLanguageChange
 }: HeaderActionsProps) {
   const { setTheme, theme, themes } = useTheme();
   const { toast } = useToast();
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState("EN"); // Placeholder
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -58,14 +61,14 @@ export function HeaderActions({
   }, [theme, themes, setTheme]);
 
   const toggleLanguage = useCallback(() => {
-    setCurrentLanguage(prev => (prev === "EN" ? "ZH" : "EN"));
-    // Add actual language change logic here if needed
+    const newLanguage = currentLanguage === "en" ? "zh" : "en";
+    onLanguageChange(newLanguage);
     toast({
-      title: "Language Switched",
-      description: `Language set to ${currentLanguage === "EN" ? "Chinese (Placeholder)" : "English"}.`,
+      title: newLanguage === 'zh' ? "语言已切换" : "Language Switched",
+      description: newLanguage === 'zh' ? `语言已设为中文` : `Language set to English.`,
       duration: 2000,
     })
-  }, [currentLanguage, toast]);
+  }, [currentLanguage, onLanguageChange, toast]);
 
   const handleFontScaleSliderChange = (value: number[]) => {
     onFontScaleChange(value[0]);
@@ -73,14 +76,14 @@ export function HeaderActions({
 
   const handleAppInstallInfo = () => {
     toast({
-      title: "App Installation (PWA)",
+      title: currentLanguage === 'zh' ? "应用安装 (PWA)" : "App Installation (PWA)",
       description: (
         <div>
-          <p>This application is a Progressive Web App (PWA) and can be installed on your device.</p>
-          <p>Look for an "Install," "Add to Home Screen," or similar option in your browser's menu to use it offline and like a native app.</p>
+          <p>{currentLanguage === 'zh' ? "此应用程序是一个渐进式网络应用 (PWA)，可以安装在您的设备上。" : "This application is a Progressive Web App (PWA) and can be installed on your device."}</p>
+          <p>{currentLanguage === 'zh' ? "在浏览器的菜单中查找“安装”、“添加到主屏幕”或类似选项，即可离线使用并获得类似原生应用的体验。" : "Look for an \"Install,\" \"Add to Home Screen,\" or similar option in your browser's menu to use it offline and like a native app."}</p>
         </div>
       ),
-      duration: 10000, // Show for 10 seconds
+      duration: 10000,
     });
   };
 
@@ -89,6 +92,17 @@ export function HeaderActions({
     if (theme === "dark") return <Icons.Moon className="h-5 w-5" />;
     return <Icons.Laptop className="h-5 w-5" />; // System theme
   };
+  
+  const T = {
+    adjustFontSize: currentLanguage === 'zh' ? '调整字号' : 'Adjust font size',
+    fontScale: currentLanguage === 'zh' ? '字号缩放' : 'Font Scale',
+    cycleTheme: currentLanguage === 'zh' ? `切换主题 (当前为 ${theme})` : `Cycle theme (Currently ${theme})`,
+    examSetup: currentLanguage === 'zh' ? '考试设置' : 'Exam Setup',
+    toggleLanguage: currentLanguage === 'zh' ? `切换语言 (当前为 ${currentLanguage === 'zh' ? '中文' : 'EN'})` : `Toggle language (Currently ${currentLanguage === 'zh' ? '中文' : 'EN'})`,
+    toggleFullscreen: currentLanguage === 'zh' ? '切换全屏' : 'Toggle fullscreen',
+    openUserManual: currentLanguage === 'zh' ? '打开用户手册' : 'Open user manual',
+    installApp: currentLanguage === 'zh' ? '安装应用 / 离线使用信息' : 'Install App / Offline Use Info',
+  };
 
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
@@ -96,12 +110,12 @@ export function HeaderActions({
         <PopoverTrigger asChild>
           <Button variant="outline" size="icon">
             <Icons.ALargeSmall className="h-5 w-5" />
-            <span className="sr-only">Adjust font size</span>
+            <span className="sr-only">{T.adjustFontSize}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-56" align="end">
           <div className="space-y-2">
-            <label htmlFor="font-slider" className="text-sm font-medium leading-none">Font Scale: {fontScale.toFixed(2)}</label>
+            <label htmlFor="font-slider" className="text-sm font-medium leading-none">{T.fontScale}: {fontScale.toFixed(2)}</label>
             <div className="flex items-center space-x-2">
               <Icons.ZoomOut className="h-4 w-4 text-muted-foreground" />
               <Slider
@@ -119,34 +133,35 @@ export function HeaderActions({
         </PopoverContent>
       </Popover>
 
-      <Button variant="outline" size="icon" onClick={cycleTheme} aria-label="Cycle theme">
+      <Button variant="outline" size="icon" onClick={cycleTheme} aria-label={T.cycleTheme}>
         {getThemeIcon()}
-        <span className="sr-only">Cycle theme (Currently {theme})</span>
+        <span className="sr-only">{T.cycleTheme}</span>
       </Button>
 
       <Button variant="outline" size="icon" onClick={onOpenExamSetup}>
         <Icons.Settings2 className="h-5 w-5" />
-        <span className="sr-only">Exam Setup</span>
+        <span className="sr-only">{T.examSetup}</span>
       </Button>
       
-      <Button variant="outline" size="icon" onClick={toggleLanguage} aria-label="Toggle language">
-        <Icons.Languages className="h-5 w-5" />
-        <span className="sr-only">Toggle language (Currently {currentLanguage})</span>
+      <Button variant="outline" size="icon" onClick={toggleLanguage} aria-label={T.toggleLanguage}>
+        {/* <Icons.Languages className="h-5 w-5" /> */}
+        <span className="text-xs font-semibold w-5 h-5 flex items-center justify-center">{currentLanguage === 'zh' ? '中' : 'EN'}</span>
+        <span className="sr-only">{T.toggleLanguage}</span>
       </Button>
 
       <Button variant="outline" size="icon" onClick={toggleFullScreen}>
         {isFullScreen ? <Icons.Shrink className="h-5 w-5" /> : <Icons.Expand className="h-5 w-5" />}
-        <span className="sr-only">Toggle fullscreen</span>
+        <span className="sr-only">{T.toggleFullscreen}</span>
       </Button>
 
       <Button variant="outline" size="icon" onClick={onOpenUserManual}>
         <Icons.BookOpenText className="h-5 w-5" />
-        <span className="sr-only">Open user manual</span>
+        <span className="sr-only">{T.openUserManual}</span>
       </Button>
 
       <Button variant="outline" size="icon" onClick={handleAppInstallInfo}>
         <Icons.Download className="h-5 w-5" />
-        <span className="sr-only">Install App / Offline Use Info</span>
+        <span className="sr-only">{T.installApp}</span>
       </Button>
     </div>
   );
