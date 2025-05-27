@@ -14,9 +14,8 @@ interface ExamInfoCardProps {
 export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   const T = {
     cardTitle: language === 'zh-hk' ? '考試資訊' : 'Exam Information',
-    examTitleLabel: language === 'zh-hk' ? '考試名稱:' : 'Exam Title:',
-    centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
-    centreNumberLabel: language === 'zh-hk' ? '考埸:' : 'Centre Number:',
+    centreNameLabel: language === 'zh-hk' ? '考埸名稱:' : 'Centre Name:',
+    centreNumberLabel: language === 'zh-hk' ? '考埸編號:' : 'Centre Number:',
     subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
     durationLabel: language === 'zh-hk' ? '考試時長:' : 'Duration:',
@@ -39,10 +38,6 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
         <ScrollArea className="h-full">
           <div className="space-y-6 text-sm md:text-base pr-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              <div>
-                <h3 className="font-semibold text-foreground/90">{T.examTitleLabel}</h3>
-                <p className="text-muted-foreground">{examDetails.title || 'N/A'}</p>
-              </div>
               <div>
                 <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
                 <p className="text-muted-foreground">{examDetails.subject || 'N/A'}</p>
@@ -82,3 +77,5 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
     </Card>
   );
 }
+
+    

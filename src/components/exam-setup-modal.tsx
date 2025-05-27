@@ -118,7 +118,7 @@ export function ExamSetupModal({
       return {
         ...prev,
         durationMinutes: newDuration,
-        title: deriveTitle(prev.subject, prev.paper, currentAppLanguage), // ensure title updates if logic depends on duration indirectly
+        title: deriveTitle(prev.subject, prev.paper, currentAppLanguage), 
         examEndTime: newEndTime,
       };
     });
@@ -144,8 +144,8 @@ export function ExamSetupModal({
   const T = {
     modalTitle: currentAppLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
     centreInformationTitle: currentAppLanguage === 'zh-hk' ? '中心資訊' : 'Centre Information',
-    centreNameLabel: currentAppLanguage === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
-    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考埸:' : 'Centre Number:',
+    centreNameLabel: currentAppLanguage === 'zh-hk' ? '考埸名稱:' : 'Centre Name:',
+    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考埸編號:' : 'Centre Number:',
     examDetailsTitle: currentAppLanguage === 'zh-hk' ? '考試詳情' : 'Exam Details',
     subjectLabel: currentAppLanguage === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: currentAppLanguage === 'zh-hk' ? '試卷:' : 'Paper:',
@@ -261,3 +261,5 @@ export function ExamSetupModal({
     </Dialog>
   );
 }
+
+    
