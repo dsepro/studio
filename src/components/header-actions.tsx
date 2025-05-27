@@ -30,9 +30,12 @@ export function HeaderActions({
   currentLanguage,
   onLanguageChange
 }: HeaderActionsProps) {
-  const { setTheme, theme, themes } = useTheme();
+  const { setTheme, theme } = useTheme(); // themes array is no longer needed from useTheme
   const { toast } = useToast();
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Available themes for cycling (System theme removed)
+  const availableThemes = ["light", "dark"];
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -55,17 +58,17 @@ export function HeaderActions({
   };
 
   const cycleTheme = useCallback(() => {
-    const currentThemeIndex = themes.indexOf(theme || 'system');
-    const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
-    setTheme(themes[nextThemeIndex]);
-  }, [theme, themes, setTheme]);
+    const currentThemeIndex = availableThemes.indexOf(theme || availableThemes[0]);
+    const nextThemeIndex = (currentThemeIndex + 1) % availableThemes.length;
+    setTheme(availableThemes[nextThemeIndex]);
+  }, [theme, setTheme, availableThemes]);
 
   const toggleLanguage = useCallback(() => {
     const newLanguage = currentLanguage === "en" ? "zh-hk" : "en";
     onLanguageChange(newLanguage);
     toast({
       title: newLanguage === 'zh-hk' ? "語言已切換" : "Language Switched",
-      description: newLanguage === 'zh-hk' ? `語言已設為繁體中文` : `Language set to English.`,
+      description: newLanguage === 'zh-hk' ? `語言已設為繁體中文（香港）。` : `Language set to English.`,
       duration: 2000,
     })
   }, [currentLanguage, onLanguageChange, toast]);
@@ -90,13 +93,14 @@ export function HeaderActions({
   const getThemeIcon = () => {
     if (theme === "light") return <Icons.Sun className="h-5 w-5" />;
     if (theme === "dark") return <Icons.Moon className="h-5 w-5" />;
-    return <Icons.Laptop className="h-5 w-5" />; // System theme
+    // Fallback or if theme is somehow undefined initially, though Popover should ensure it's set
+    return <Icons.Sun className="h-5 w-5" />; 
   };
   
   const T = {
     adjustFontSize: currentLanguage === 'zh-hk' ? '調整字型大小' : 'Adjust font size',
     fontScale: currentLanguage === 'zh-hk' ? '字型縮放' : 'Font Scale',
-    cycleTheme: currentLanguage === 'zh-hk' ? `切換主題 (目前為 ${theme === 'light' ? '淺色' : theme === 'dark' ? '深色' : '系統'})` : `Cycle theme (Currently ${theme})`,
+    cycleTheme: currentLanguage === 'zh-hk' ? `切換主題 (目前為 ${theme === 'light' ? '淺色' : '深色'})` : `Cycle theme (Currently ${theme === 'light' ? 'Light' : 'Dark'})`,
     examSetup: currentLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
     toggleLanguage: currentLanguage === 'zh-hk' ? `切換語言 (目前為 繁)` : `Toggle language (Currently EN)`,
     toggleFullscreen: currentLanguage === 'zh-hk' ? '切換全螢幕' : 'Toggle fullscreen',
@@ -137,12 +141,12 @@ export function HeaderActions({
         {getThemeIcon()}
         <span className="sr-only">{T.cycleTheme}</span>
       </Button>
-
+      
       <Button variant="outline" size="icon" onClick={onOpenExamSetup} aria-label={T.examSetup}>
         <Icons.Settings2 className="h-5 w-5" />
         <span className="sr-only">{T.examSetup}</span>
       </Button>
-      
+
       <Button variant="outline" size="icon" onClick={toggleLanguage} aria-label={T.toggleLanguage}>
         <span className="text-xs font-semibold w-5 h-5 flex items-center justify-center">{currentLanguage === 'zh-hk' ? '繁' : 'EN'}</span>
         <span className="sr-only">{T.toggleLanguage}</span>
@@ -165,3 +169,4 @@ export function HeaderActions({
     </div>
   );
 }
+

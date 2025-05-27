@@ -10,25 +10,30 @@ import { ConfirmationDialog } from '@/components/confirmation-dialog';
 import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
 import useLocalStorage from '@/hooks/use-local-storage';
+import { formatDurationFromMinutes } from '@/lib/exam-presets';
 
 export interface ExamDetails {
-  title: string;
-  code: string;
+  title: string; // Main title, often from preset or derived
+  centreName: string;
+  centreNumber: string;
   subject: string;
-  timeAllowed: string;
-  instructions: string[];
+  paper: string;
+  durationMinutes: number;
+  examStartTime: string;
+  examEndTime: string;
+  examLanguage: 'en' | 'zh-hk';
 }
 
 const initialExamDetails: ExamDetails = {
   title: "DSE Mathematics Compulsory Part Paper 1",
-  code: "MATH CP P1",
+  centreName: "", // "ABC Secondary School",
+  centreNumber: "", // "A1234",
   subject: "Mathematics Compulsory Part",
-  timeAllowed: "2 hours 15 minutes",
-  instructions: [
-    "Attempt ALL questions.",
-    "Unless otherwise specified, all working must be clearly shown.",
-    "Unless otherwise specified, numerical answers should be either exact or correct to 3 significant figures.",
-  ],
+  paper: "Paper 1",
+  durationMinutes: 135, // 2 hours 15 minutes
+  examStartTime: "08:30",
+  examEndTime: "10:45",
+  examLanguage: 'en',
 };
 
 
@@ -66,7 +71,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl"> {/* Adjusted max-width for content */}
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <MainClock />
@@ -84,10 +89,10 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8">
+      <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8"> {/* Consistent max-width */}
         <div className="grid grid-cols-1 gap-6">
           <TimerCard 
-            initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)}
+            initialDurationMinutes={examDetails.durationMinutes}
             language={language}
           />
           <ExamInfoCard examDetails={examDetails} language={language} />
@@ -104,7 +109,8 @@ export default function Home() {
         onClose={() => setIsExamSetupOpen(false)}
         currentDetails={examDetails}
         onSave={(newDetails) => setExamDetails(newDetails)}
-        language={language}
+        language={language} // app display language
+        currentAppLanguage={language}
       />
       <ConfirmationDialog
         isOpen={confirmationState.isOpen}
@@ -118,25 +124,7 @@ export default function Home() {
   );
 }
 
-function parseDurationToMinutes(durationStr: string): number {
-  let totalMinutes = 0;
-  const hoursMatch = durationStr.match(/(\d+)\s*hours?/i);
-  const minutesMatch = durationStr.match(/(\d+)\s*minutes?/i);
-  const hourZhMatch = durationStr.match(/(\d+)\s*小時/i);
-  const minuteZhMatch = durationStr.match(/(\d+)\s*分鐘/i);
+// This function is no longer needed here as duration is stored in minutes.
+// formatting will be done in ExamInfoCard or where needed.
+// function parseDurationToMinutes(durationStr: string): number { ... }
 
-
-  if (hoursMatch && hoursMatch[1]) {
-    totalMinutes += parseInt(hoursMatch[1], 10) * 60;
-  } else if (hourZhMatch && hourZhMatch[1]) {
-    totalMinutes += parseInt(hourZhMatch[1], 10) * 60;
-  }
-
-  if (minutesMatch && minutesMatch[1]) {
-    totalMinutes += parseInt(minutesMatch[1], 10);
-  } else if (minuteZhMatch && minuteZhMatch[1]) {
-     totalMinutes += parseInt(minuteZhMatch[1], 10);
-  }
-  
-  return totalMinutes > 0 ? totalMinutes : 135; // Default to 135 minutes (2h 15m) if parsing fails
-}

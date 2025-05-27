@@ -3,22 +3,31 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ExamDetails } from '@/app/page'; 
+import { formatDurationFromMinutes } from "@/lib/exam-presets";
 
 interface ExamInfoCardProps {
   examDetails: ExamDetails;
-  language: string;
+  language: string; // App display language
 }
 
 export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
   const T = {
     cardTitle: language === 'zh-hk' ? '考試資訊' : 'Exam Information',
     examTitleLabel: language === 'zh-hk' ? '考試名稱:' : 'Exam Title:',
-    examCodeLabel: language === 'zh-hk' ? '考試代號:' : 'Exam Code:',
+    centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
+    centreNumberLabel: language === 'zh-hk' ? '中心編號:' : 'Centre Number:',
     subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
-    timeAllowedLabel: language === 'zh-hk' ? '允許時間:' : 'Time Allowed:',
-    instructionsLabel: language === 'zh-hk' ? '考試說明:' : 'Instructions:',
-    noInstructions: language === 'zh-hk' ? '未提供具體說明。' : 'No specific instructions provided.',
+    paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
+    durationLabel: language === 'zh-hk' ? '考試時長:' : 'Duration:',
+    startTimeLabel: language === 'zh-hk' ? '開始時間:' : 'Start Time:',
+    endTimeLabel: language === 'zh-hk' ? '結束時間:' : 'End Time:',
+    examLanguageLabel: language === 'zh-hk' ? '試卷語言:' : 'Exam Language:',
+    langEn: language === 'zh-hk' ? '英文' : 'English',
+    langZhHk: language === 'zh-hk' ? '中文（香港）' : 'Chinese (Hong Kong)',
   };
+
+  const displayDuration = formatDurationFromMinutes(examDetails.durationMinutes, language);
+  const displayExamLanguage = examDetails.examLanguage === 'en' ? T.langEn : T.langZhHk;
 
   return (
     <Card>
@@ -29,32 +38,40 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
           <div>
             <h3 className="font-semibold text-foreground/90">{T.examTitleLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.title}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground/90">{T.examCodeLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.code}</p>
+            <p className="text-muted-foreground">{examDetails.title || 'N/A'}</p>
           </div>
           <div>
             <h3 className="font-semibold text-foreground/90">{T.subjectLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.subject}</p>
+            <p className="text-muted-foreground">{examDetails.subject || 'N/A'}</p>
           </div>
           <div>
-            <h3 className="font-semibold text-foreground/90">{T.timeAllowedLabel}</h3>
-            <p className="text-muted-foreground">{examDetails.timeAllowed}</p>
+            <h3 className="font-semibold text-foreground/90">{T.paperLabel}</h3>
+            <p className="text-muted-foreground">{examDetails.paper || 'N/A'}</p>
           </div>
-        </div>
-        <div>
-          <h3 className="font-semibold text-foreground/90">{T.instructionsLabel}</h3>
-          {examDetails.instructions && examDetails.instructions.length > 0 ? (
-            <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-1">
-              {examDetails.instructions.map((instr, index) => (
-                <li key={index}>{instr}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground mt-1">{T.noInstructions}</p>
-          )}
+          <div>
+            <h3 className="font-semibold text-foreground/90">{T.durationLabel}</h3>
+            <p className="text-muted-foreground">{displayDuration}</p>
+          </div>
+           <div>
+            <h3 className="font-semibold text-foreground/90">{T.centreNameLabel}</h3>
+            <p className="text-muted-foreground">{examDetails.centreName || 'N/A'}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground/90">{T.centreNumberLabel}</h3>
+            <p className="text-muted-foreground">{examDetails.centreNumber || 'N/A'}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground/90">{T.startTimeLabel}</h3>
+            <p className="text-muted-foreground">{examDetails.examStartTime || 'N/A'}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground/90">{T.endTimeLabel}</h3>
+            <p className="text-muted-foreground">{examDetails.examEndTime || 'N/A'}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground/90">{T.examLanguageLabel}</h3>
+            <p className="text-muted-foreground">{displayExamLanguage}</p>
+          </div>
         </div>
       </CardContent>
     </Card>
