@@ -7,19 +7,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
+  DialogFooter, // DialogDescription removed as per UI
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Icons } from "@/components/icons"; // For Download icon
+import { Icons } from "@/components/icons";
 import type { ExamDetails } from '@/app/page';
 import { ScrollArea } from './ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { examPresets, type ExamPreset } from '@/lib/exam-presets';
+import { examPresets } from '@/lib/exam-presets';
 import { useToast } from "@/hooks/use-toast";
-
 
 interface ExamSetupModalProps {
   isOpen: boolean;
@@ -36,13 +34,14 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
   const { toast } = useToast();
 
   useEffect(() => {
-    setDetails(currentDetails);
-    // Try to find if currentDetails match any preset to pre-select it
-    const matchedPreset = examPresets.find(p => 
-      (currentAppLanguage === 'zh-hk' ? p.zhTitle : p.enTitle) === currentDetails.title &&
-      p.durationMinutes === currentDetails.durationMinutes
-    );
-    setSelectedPresetId(matchedPreset ? matchedPreset.id : "");
+    if (isOpen) {
+        setDetails(currentDetails);
+        const matchedPreset = examPresets.find(p => 
+          (currentAppLanguage === 'zh-hk' ? p.zhTitle : p.enTitle) === currentDetails.title &&
+          p.durationMinutes === currentDetails.durationMinutes
+        );
+        setSelectedPresetId(matchedPreset ? matchedPreset.id : "");
+    }
   }, [currentDetails, isOpen, currentAppLanguage]);
 
   const handlePresetChange = (presetId: string) => {
@@ -50,40 +49,68 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     const selectedPreset = examPresets.find(p => p.id === presetId);
     if (selectedPreset) {
       const presetTitle = currentAppLanguage === 'zh-hk' ? selectedPreset.zhTitle : selectedPreset.enTitle;
-      setDetails({
+      setDetails(prev => ({
+        ...prev, // Keep existing centreName, centreNumber, examStartTime, examEndTime, examLanguage
         title: presetTitle,
-        subject: presetTitle, // Use preset title as subject
-        paper: "", // User to fill paper for presets
+        subject: presetTitle, 
+        paper: "", 
         durationMinutes: selectedPreset.durationMinutes,
-        centreName: "", 
-        centreNumber: "",
-        examStartTime: "00:00",
-        examEndTime: "00:00",
-        examLanguage: currentAppLanguage as 'en' | 'zh-hk', // Default exam language to app language
-      });
+      }));
     } else {
-      // If "Custom Input" or no preset is selected, reset to current or allow full manual input
-      // For now, let's revert to currentDetails or an empty slate if preferred
-      setDetails(currentDetails); 
+      // If "Custom Input" is selected, user can freely edit.
+      // Title will be derived from subject and paper if they change.
+      // No specific action needed here beyond setting selectedPresetId.
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSelectedPresetId(""); // Clear preset selection on manual change
-    setDetails(prev => ({ 
-      ...prev, 
-      [name]: name === "durationMinutes" ? (parseInt(value, 10) || 0) : value 
-    }));
+    
+    setDetails(prev => {
+      const newDetails = {
+        ...prev,
+        [name]: name === "durationMinutes" ? (parseInt(value, 10) || 0) : value,
+      };
+
+      // If subject or paper is changed, consider it manual input for title derivation
+      if (name === "subject" || name === "paper") {
+        setSelectedPresetId(""); // Clear preset selection
+        newDetails.title = (newDetails.subject || "") + (newDetails.paper ? ` ${newDetails.paper}` : "");
+      }
+      return newDetails;
+    });
   };
   
   const handleExamLanguageChange = (lang: 'en' | 'zh-hk') => {
-    setSelectedPresetId(""); 
+    // setSelectedPresetId(""); // Not strictly necessary to clear preset if only exam language changes
     setDetails(prev => ({ ...prev, examLanguage: lang }));
   };
 
   const handleSave = () => {
-    onSave(details);
+    let finalDetails = { ...details };
+    
+    // Consolidate title: If title is empty or doesn't match subject/paper, and not from a selected preset that still matches subject/duration
+    const activePreset = examPresets.find(p => p.id === selectedPresetId);
+    let currentPresetTitle = "";
+    if (activePreset) {
+        currentPresetTitle = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
+    }
+
+    if (selectedPresetId && activePreset && finalDetails.subject === currentPresetTitle && finalDetails.durationMinutes === activePreset.durationMinutes) {
+        // If a preset is selected and subject/duration match, use preset title
+        finalDetails.title = currentPresetTitle;
+    } else {
+        // Otherwise, derive from subject and paper
+        const derivedTitle = (finalDetails.subject || "") + (finalDetails.paper ? ` ${finalDetails.paper}` : "");
+        finalDetails.title = derivedTitle.trim();
+    }
+
+    // If title is still empty (e.g., subject and paper are empty), provide a default
+    if (!finalDetails.title.trim()) {
+      finalDetails.title = language === 'zh-hk' ? '自訂考試' : 'Custom Exam';
+    }
+    
+    onSave(finalDetails);
     onClose();
   };
 
@@ -100,34 +127,26 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     });
   };
 
-
   const T = {
     modalTitle: language === 'zh-hk' ? '考試設定' : 'Exam Setup',
-    // modalDescription: language === 'zh-hk' ? '配置目前考試的詳細資訊，或從預設集中選擇。' : 'Configure the details for the current exam, or choose from a preset.',
-    
     centreInformationTitle: language === 'zh-hk' ? '中心資訊' : 'Centre Information',
     centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
     centreNumberLabel: language === 'zh-hk' ? '中心編號:' : 'Centre Number:',
-
     examDetailsTitle: language === 'zh-hk' ? '考試詳情' : 'Exam Details',
     subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
     selectPresetLabel: language === 'zh-hk' ? '選擇預設考試:' : 'Select Preset Exam:',
     selectPresetPlaceholder: language === 'zh-hk' ? '選擇或手動輸入...' : 'Select or input manually...',
     customPresetOption: language === 'zh-hk' ? '手動輸入' : 'Manual Input',
-
-
     timingTitle: language === 'zh-hk' ? '時間安排' : 'Timing',
     durationMinutesLabel: language === 'zh-hk' ? '時長 (分鐘):' : 'Duration (Minutes):',
     examTimeLabel: language === 'zh-hk' ? '考試時間:' : 'Exam Time:',
     examStartTimeLabel: language === 'zh-hk' ? '由' : 'From',
     examEndTimeLabel: language === 'zh-hk' ? '至' : 'To',
-    
     examLanguageTitle: language === 'zh-hk' ? '試卷語言' : 'Exam Language',
     languageLabel: language === 'zh-hk' ? '語言:' : 'Language:',
     langZhHkButton: language === 'zh-hk' ? '中文' : '中文',
     langEnButton: language === 'zh-hk' ? 'English' : 'English',
-
     downloadAppButton: language === 'zh-hk' ? '下載應用程式' : 'Download App',
     cancelButton: language === 'zh-hk' ? '取消' : 'Cancel',
     confirmAndCloseButton: language === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
@@ -147,12 +166,10 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl">{T.modalTitle}</DialogTitle>
-          {/* <DialogDescription>{T.modalDescription}</DialogDescription> */}
         </DialogHeader>
         <ScrollArea className="h-[65vh] p-1 pr-4">
           <div className="space-y-6 py-4 pr-2">
             
-            {/* Preset Selector */}
             <div>
               <Label htmlFor="preset-select" className="text-foreground/90 text-sm">{T.selectPresetLabel}</Label>
               <Select value={selectedPresetId} onValueChange={handlePresetChange}>
@@ -170,7 +187,6 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               </Select>
             </div>
 
-            {/* Centre Information */}
             <div className="space-y-4 p-4 border rounded-md">
               <h3 className="text-lg font-semibold text-foreground">{T.centreInformationTitle}</h3>
               <div>
@@ -183,7 +199,6 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               </div>
             </div>
 
-            {/* Exam Details */}
             <div className="space-y-4 p-4 border rounded-md">
               <h3 className="text-lg font-semibold text-foreground">{T.examDetailsTitle}</h3>
               <div>
@@ -194,11 +209,8 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
                 <Label htmlFor="paper" className="text-foreground/90">{T.paperLabel}</Label>
                 <Input id="paper" name="paper" value={details.paper} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
               </div>
-               {/* Hidden title input for preset consistency, or could be removed if subject+paper is always the title */}
-              <Input type="hidden" id="title" name="title" value={details.title} onChange={handleChange} />
             </div>
 
-            {/* Timing */}
             <div className="space-y-4 p-4 border rounded-md">
               <h3 className="text-lg font-semibold text-foreground">{T.timingTitle}</h3>
               <div>
@@ -215,7 +227,6 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               </div>
             </div>
             
-            {/* Exam Language */}
             <div className="space-y-2 p-4 border rounded-md">
               <h3 className="text-lg font-semibold text-foreground">{T.examLanguageTitle}</h3>
               <Label className="text-foreground/90">{T.languageLabel}</Label>

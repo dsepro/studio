@@ -29,12 +29,12 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
     headerBarTitle: language === 'zh-hk' ? '頂部導覽列' : 'Header Bar',
     headerBarItems: [
       language === 'zh-hk' ? '<strong>時鐘:</strong> 顯示目前系統時間。' : '<strong>Clock:</strong> Displays the current system time.',
+      language === 'zh-hk' ? '<strong>字型大小調整 (+/- 圖示):</strong> 點擊增大或減小按鈕來調整應用的基礎字型大小。' : '<strong>Font Size (+/- icons):</strong> Click the increase or decrease buttons to adjust the application\'s base font size.',
       language === 'zh-hk' ? '<strong>主題切換 (太陽/月亮圖示):</strong> 在淺色和深色主題之間切換。' : '<strong>Theme Toggle (Sun/Moon icon):</strong> Toggles between light and dark themes.',
+      language === 'zh-hk' ? '<strong>考試設定 (設定圖示):</strong> 開啟考試配置模式。您可以選擇預設考試，或手動輸入中心資訊、考試科目、試卷、時長、考試時間及試卷語言。' : '<strong>Exam Setup (Settings icon):</strong> Opens the exam configuration modal. You can select a preset exam or manually enter centre information, exam subject, paper, duration, exam times, and exam language.',
       language === 'zh-hk' ? '<strong>語言切換 (繁/EN 圖示):</strong> 切換顯示語言 (繁體中文（香港）/英文)。' : '<strong>Language Toggle (繁/EN icon):</strong> Toggle display language (Traditional Chinese (Hong Kong)/English).',
       language === 'zh-hk' ? '<strong>全螢幕切換 (展開/收縮圖示):</strong> 進入或退出全螢幕模式。' : '<strong>Fullscreen Toggle (Expand/Shrink icon):</strong> Enter or exit fullscreen mode.',
       language === 'zh-hk' ? '<strong>用戶手冊 (書本圖示):</strong> 開啟此指南。' : '<strong>User Manual (Book icon):</strong> Opens this guide.',
-      language === 'zh-hk' ? '<strong>字型大小調整 (字型圖示):</strong> 點擊開啟一個彈出框，使用滑桿調整應用的基礎字型大小。' : '<strong>Font Size (Font icon):</strong> Click to open a popover with a slider to adjust the application\'s base font size.',
-      language === 'zh-hk' ? '<strong>考試設定 (設定圖示):</strong> 開啟考試配置模式。您可以選擇預設考試，或手動輸入中心資訊、考試科目、試卷、時長、考試時間及試卷語言。' : '<strong>Exam Setup (Settings icon):</strong> Opens the exam configuration modal. You can select a preset exam or manually enter centre information, exam subject, paper, duration, exam times, and exam language.',
       language === 'zh-hk' ? '<strong>安裝應用程式 (下載圖示):</strong> 此應用程式是一個漸進式網絡應用程式 (PWA)。點擊此按鈕會提示資訊，您可以通常透過瀏覽器的選單選項（例如，「安裝應用程式」或「新增至主畫面」）將其安裝到您的裝置上，以便離線使用並獲得類似原生應用程式的體驗。' : '<strong>Install App (Download icon):</strong> This app is a Progressive Web App (PWA). Clicking this gives info, and you can typically install it to your device via your browser\'s menu options (e.g., "Install App" or "Add to Home Screen") for offline use and a native-app-like experience.',
     ],
     examInfoCardTitle: language === 'zh-hk' ? '考試資訊卡片' : 'Exam Information Card',
@@ -51,9 +51,9 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
     tipsTitle: language === 'zh-hk' ? '提示' : 'Tips',
     tipsItems: [
       language === 'zh-hk' ? '使用全螢幕模式以獲得無干擾的環境。' : 'Use fullscreen mode for a distraction-free environment.',
-      language === 'zh-hk' ? '調整字型大小以獲得舒適的閱讀體驗。' : 'Adjust font size for comfort.',
+      language === 'zh-hk' ? '使用 +/- 按鈕調整字型大小以獲得舒適的閱讀體驗。' : 'Use the +/- buttons to adjust font size for comfort.',
       language === 'zh-hk' ? '在開始前透過「考試設定」設定好考試詳細資訊或選擇一個預設集。' : 'Set up exam details via "Exam Setup" or choose a preset before starting.',
-      language === 'zh-hk' ? '如果計時器未運行，可以點擊時間顯示或使用 +/- 按鈕來修改剩餘時間。' : 'Modify the remaining time by clicking on the time display (to open a modal) or using the +/- buttons if the timer isn\'t running.',
+      language === 'zh-hk' ? '如果計時器未運行，可以點擊時間顯示（打開編輯彈窗）或使用 +/- 按鈕來修改剩餘時間。' : 'Modify the remaining time by clicking on the time display (to open a modal) or using the +/- buttons if the timer isn\'t running.',
     ],
     closeButton: language === 'zh-hk' ? '關閉' : 'Close',
   };

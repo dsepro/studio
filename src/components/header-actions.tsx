@@ -4,12 +4,6 @@
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import React, { useState, useEffect, useCallback } from "react";
 
@@ -17,10 +11,14 @@ interface HeaderActionsProps {
   onOpenUserManual: () => void;
   onOpenExamSetup: () => void;
   fontScale: number;
-  onFontScaleChange: (scale: number) => void;
+  onFontScaleChange: (scale: number) => void; // This remains the same
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
 }
+
+const MIN_FONT_SCALE = 0.8;
+const MAX_FONT_SCALE = 1.5;
+const FONT_SCALE_STEP = 0.05;
 
 export function HeaderActions({ 
   onOpenUserManual, 
@@ -30,11 +28,10 @@ export function HeaderActions({
   currentLanguage,
   onLanguageChange
 }: HeaderActionsProps) {
-  const { setTheme, theme } = useTheme(); // themes array is no longer needed from useTheme
+  const { setTheme, theme } = useTheme();
   const { toast } = useToast();
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  // Available themes for cycling (System theme removed)
   const availableThemes = ["light", "dark"];
 
   useEffect(() => {
@@ -73,10 +70,6 @@ export function HeaderActions({
     })
   }, [currentLanguage, onLanguageChange, toast]);
 
-  const handleFontScaleSliderChange = (value: number[]) => {
-    onFontScaleChange(value[0]);
-  };
-
   const handleAppInstallInfo = () => {
     toast({
       title: currentLanguage === 'zh-hk' ? "應用程式安裝 (PWA)" : "App Installation (PWA)",
@@ -93,13 +86,21 @@ export function HeaderActions({
   const getThemeIcon = () => {
     if (theme === "light") return <Icons.Sun className="h-5 w-5" />;
     if (theme === "dark") return <Icons.Moon className="h-5 w-5" />;
-    // Fallback or if theme is somehow undefined initially, though Popover should ensure it's set
     return <Icons.Sun className="h-5 w-5" />; 
+  };
+
+  const decreaseFontScale = () => {
+    onFontScaleChange(Math.max(MIN_FONT_SCALE, parseFloat((fontScale - FONT_SCALE_STEP).toFixed(2))));
+  };
+
+  const increaseFontScale = () => {
+    onFontScaleChange(Math.min(MAX_FONT_SCALE, parseFloat((fontScale + FONT_SCALE_STEP).toFixed(2))));
   };
   
   const T = {
-    adjustFontSize: currentLanguage === 'zh-hk' ? '調整字型大小' : 'Adjust font size',
-    fontScale: currentLanguage === 'zh-hk' ? '字型縮放' : 'Font Scale',
+    decreaseFontSize: currentLanguage === 'zh-hk' ? '減小字型' : 'Decrease font size',
+    increaseFontSize: currentLanguage === 'zh-hk' ? '增大字型' : 'Increase font size',
+    currentFontSize: currentLanguage === 'zh-hk' ? `目前字型大小: ${fontScale.toFixed(2)}` : `Current Font Size: ${fontScale.toFixed(2)}`,
     cycleTheme: currentLanguage === 'zh-hk' ? `切換主題 (目前為 ${theme === 'light' ? '淺色' : '深色'})` : `Cycle theme (Currently ${theme === 'light' ? 'Light' : 'Dark'})`,
     examSetup: currentLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
     toggleLanguage: currentLanguage === 'zh-hk' ? `切換語言 (目前為 繁)` : `Toggle language (Currently EN)`,
@@ -110,32 +111,17 @@ export function HeaderActions({
 
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" aria-label={T.adjustFontSize}>
-            <Icons.ALargeSmall className="h-5 w-5" />
-            <span className="sr-only">{T.adjustFontSize}</span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-56" align="end">
-          <div className="space-y-2">
-            <label htmlFor="font-slider" className="text-sm font-medium leading-none">{T.fontScale}: {fontScale.toFixed(2)}</label>
-            <div className="flex items-center space-x-2">
-              <Icons.ZoomOut className="h-4 w-4 text-muted-foreground" />
-              <Slider
-                id="font-slider"
-                min={0.8}
-                max={1.5}
-                step={0.05}
-                value={[fontScale]}
-                onValueChange={handleFontScaleSliderChange}
-                className="w-full"
-              />
-              <Icons.ZoomIn className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
+      <Button variant="outline" size="icon" onClick={decreaseFontScale} aria-label={T.decreaseFontSize} disabled={fontScale <= MIN_FONT_SCALE}>
+        <Icons.Minus className="h-5 w-5" />
+        <span className="sr-only">{T.decreaseFontSize}</span>
+      </Button>
+      <Button variant="outline" size="icon" onClick={increaseFontScale} aria-label={T.increaseFontSize} disabled={fontScale >= MAX_FONT_SCALE}>
+        <Icons.Plus className="h-5 w-5" />
+        <span className="sr-only">{T.increaseFontSize}</span>
+      </Button>
+      {/* Tooltip to show current font scale for accessibility, consider a visual indicator if needed */}
+      <span className="sr-only">{T.currentFontSize}</span>
+
 
       <Button variant="outline" size="icon" onClick={cycleTheme} aria-label={T.cycleTheme}>
         {getThemeIcon()}
@@ -169,4 +155,3 @@ export function HeaderActions({
     </div>
   );
 }
-
