@@ -11,7 +11,7 @@ interface HeaderActionsProps {
   onOpenUserManual: () => void;
   onOpenExamSetup: () => void;
   fontScale: number;
-  onFontScaleChange: (scale: number) => void; // This remains the same
+  onFontScaleChange: (scale: number) => void;
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
 }
@@ -32,7 +32,7 @@ export function HeaderActions({
   const { toast } = useToast();
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const availableThemes = ["light", "dark"];
+  const availableThemes = ["light", "dark"]; // Removed "system"
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -63,12 +63,8 @@ export function HeaderActions({
   const toggleLanguage = useCallback(() => {
     const newLanguage = currentLanguage === "en" ? "zh-hk" : "en";
     onLanguageChange(newLanguage);
-    toast({
-      title: newLanguage === 'zh-hk' ? "語言已切換" : "Language Switched",
-      description: newLanguage === 'zh-hk' ? `語言已設為繁體中文（香港）。` : `Language set to English.`,
-      duration: 2000,
-    })
-  }, [currentLanguage, onLanguageChange, toast]);
+    // Removed toast notification
+  }, [currentLanguage, onLanguageChange]);
 
   const handleAppInstallInfo = () => {
     toast({
@@ -119,7 +115,6 @@ export function HeaderActions({
         <Icons.Plus className="h-5 w-5" />
         <span className="sr-only">{T.increaseFontSize}</span>
       </Button>
-      {/* Tooltip to show current font scale for accessibility, consider a visual indicator if needed */}
       <span className="sr-only">{T.currentFontSize}</span>
 
 
