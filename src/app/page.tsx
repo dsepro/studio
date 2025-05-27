@@ -24,15 +24,15 @@ export interface ExamDetails {
 }
 
 const initialExamDetails: ExamDetails = {
-  title: "Chinese Language Paper 1", 
-  centreName: "ABC Secondary School", // Default to English version for base
+  title: "中國語文 試卷一", 
+  centreName: "香城中學",
   centreNumber: "A1234",
-  subject: "Chinese Language", // Default to English version for base
-  paper: "Paper 1", // Default to English version for base
+  subject: "中國語文",
+  paper: "試卷一",
   durationMinutes: 90,
   examStartTime: "08:30",
   examEndTime: "10:00",
-  examLanguage: 'zh-hk', // Exam language is Chinese
+  examLanguage: 'zh-hk',
 };
 
 
@@ -108,7 +108,6 @@ export default function Home() {
 
       <footer className="py-4 text-center text-xs text-muted-foreground border-t">
         {appFooterCreator} <br />
-        © {currentYear} {language === 'zh-hk' ? '考試資訊' : 'Examination Information'}
       </footer>
 
       <UserManualModal isOpen={isUserManualOpen} onClose={() => setIsUserManualOpen(false)} language={language} />
