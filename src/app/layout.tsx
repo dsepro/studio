@@ -12,6 +12,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Exam Info Board',
   description: 'Exam Information and Timer Application',
+  manifest: '/manifest.json', // Link to the manifest file
 };
 
 export default function RootLayout({
@@ -21,6 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="theme-color" content="#0ea5e9" /> {/* PWA theme color */}
+      </head>
       <body className="antialiased min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"

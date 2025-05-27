@@ -66,13 +66,13 @@ export function HeaderActions({
     onFontScaleChange(value[0]);
   };
 
-  const handleDownloadApp = () => {
+  const handleAppInstallInfo = () => {
     toast({
-      title: "Offline Capability",
+      title: "App Installation (PWA)",
       description: (
         <div>
-          <p>Modern web apps like this one are best made available offline as Progressive Web Apps (PWAs), which allow them to be "installed" and cache data.</p>
-          <p>Directly downloading as a single HTML file for full offline use is not typical for this app structure. Consider PWA features for a robust offline experience.</p>
+          <p>This application is a Progressive Web App (PWA) and can be installed on your device.</p>
+          <p>Look for an "Install," "Add to Home Screen," or similar option in your browser's menu to use it offline and like a native app.</p>
         </div>
       ),
       duration: 10000, // Show for 10 seconds
@@ -165,9 +165,9 @@ export function HeaderActions({
         <span className="sr-only">Open user manual</span>
       </Button>
 
-      <Button variant="outline" size="icon" onClick={handleDownloadApp}>
+      <Button variant="outline" size="icon" onClick={handleAppInstallInfo}>
         <Icons.Download className="h-5 w-5" />
-        <span className="sr-only">Download App for Offline Use</span>
+        <span className="sr-only">Install App / Offline Use Info</span>
       </Button>
     </div>
   );
