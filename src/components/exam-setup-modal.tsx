@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -24,102 +24,127 @@ interface ExamSetupModalProps {
   onClose: () => void;
   currentDetails: ExamDetails;
   onSave: (newDetails: ExamDetails) => void;
-  language: string; 
-  currentAppLanguage: string; 
+  language: string; // App display language (zh-hk or en)
+  currentAppLanguage: string; // App display language, passed explicitly for preset title localization
 }
 
-export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, language, currentAppLanguage }: ExamSetupModalProps) {
-  const [details, setDetails] = useState<ExamDetails>(currentDetails);
+const deriveTitle = (subject: string, paper: string): string => {
+  const s = subject?.trim() || "";
+  const p = paper?.trim() || "";
+  if (!s && !p) return "";
+  return `${s}${p ? ` ${p}` : ""}`.trim();
+};
+
+export function ExamSetupModal({ 
+  isOpen, 
+  onClose, 
+  currentDetails, 
+  onSave, 
+  language, 
+  currentAppLanguage 
+}: ExamSetupModalProps) {
+  const [formState, setFormState] = useState<ExamDetails>(currentDetails);
   const [selectedPresetId, setSelectedPresetId] = useState<string>("");
   const { toast } = useToast();
 
+  // Effect to initialize form when modal opens or currentDetails/language changes
   useEffect(() => {
     if (isOpen) {
-        setDetails(currentDetails);
-        const matchedPreset = examPresets.find(p => 
-          (currentAppLanguage === 'zh-hk' ? p.zhTitle : p.enTitle) === currentDetails.title &&
-          p.durationMinutes === currentDetails.durationMinutes
-        );
-        setSelectedPresetId(matchedPreset ? matchedPreset.id : "");
+      setFormState(currentDetails);
+      const matchedPreset = examPresets.find(p => {
+        const presetTitle = currentAppLanguage === 'zh-hk' ? p.zhTitle : p.enTitle;
+        return presetTitle === currentDetails.title && p.durationMinutes === currentDetails.durationMinutes;
+      });
+      setSelectedPresetId(matchedPreset ? matchedPreset.id : "");
     }
   }, [currentDetails, isOpen, currentAppLanguage]);
 
-  const handlePresetChange = (presetId: string) => {
-    setSelectedPresetId(presetId);
-    const selectedPreset = examPresets.find(p => p.id === presetId);
+
+  const handlePresetChange = useCallback((newPresetId: string) => {
+    setSelectedPresetId(newPresetId);
+    const selectedPreset = examPresets.find(p => p.id === newPresetId);
+
     if (selectedPreset) {
       const presetTitle = currentAppLanguage === 'zh-hk' ? selectedPreset.zhTitle : selectedPreset.enTitle;
-      setDetails(prev => ({
-        ...prev,
+      setFormState(prev => ({
+        ...prev, // Keep existing centreName, centreNumber, examStartTime, examEndTime, examLanguage
         title: presetTitle,
-        subject: presetTitle, 
-        paper: "", 
+        subject: presetTitle,
+        paper: "", // Clear paper when selecting a preset
         durationMinutes: selectedPreset.durationMinutes,
       }));
     } else {
-      // Switched to "Manual Input" from a preset
-      // Title will be derived from subject/paper if they are subsequently changed, or on save.
-      // Or, if user wants immediate title update when switching to manual:
-      // setDetails(prev => ({ ...prev, title: (prev.subject || "") + (prev.paper ? ` ${prev.paper}` : "") }));
+      // Switched to "Manual Input"
+      setFormState(prev => ({
+        ...prev,
+        title: deriveTitle(prev.subject, prev.paper),
+      }));
     }
-  };
+  }, [currentAppLanguage]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    setDetails(prevDetails => {
-      const newDetails = {
-        ...prevDetails,
-        [name]: name === "durationMinutes" ? (Math.max(0, parseInt(value, 10)) || 0) : value,
+    const isNumericField = name === "durationMinutes";
+    const newValue = isNumericField ? (Math.max(0, parseInt(value, 10)) || 0) : value;
+
+    setFormState(prevFormState => {
+      const updatedFormState = {
+        ...prevFormState,
+        [name]: newValue,
       };
 
       let newSelectedPresetId = selectedPresetId;
 
-      if (selectedPresetId) { 
+      // Invalidate preset if core fields (subject, duration) change
+      if (selectedPresetId) {
         const activePreset = examPresets.find(p => p.id === selectedPresetId);
         if (activePreset) {
           const presetSubject = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
-          // If subject or duration deviates from the active preset, clear preset selection
-          if ( (name === "subject" && newDetails.subject !== presetSubject) || 
-               (name === "durationMinutes" && newDetails.durationMinutes !== activePreset.durationMinutes) ) {
-            newSelectedPresetId = ""; 
+          if ( (name === "subject" && updatedFormState.subject !== presetSubject) ||
+               (name === "durationMinutes" && updatedFormState.durationMinutes !== activePreset.durationMinutes)
+             ) {
+            newSelectedPresetId = ""; // Invalidate preset
           }
         }
       }
       
-      // If subject or paper is changed, it's definitely custom.
-      // This also handles the case where a preset was selected, then subject/paper edited.
-      if (name === "subject" || name === "paper") {
-        newSelectedPresetId = ""; 
-        newDetails.title = (newDetails.subject || "") + (newDetails.paper ? ` ${newDetails.paper}`.trimEnd() : "");
+      // If now in manual mode (or was already) and subject/paper changed, update title
+      if (newSelectedPresetId === "" && (name === "subject" || name === "paper")) {
+        updatedFormState.title = deriveTitle(updatedFormState.subject, updatedFormState.paper);
+      } else if (newSelectedPresetId !== "" && (name === "subject" || name === "durationMinutes")) {
+        // If a preset is active but subject/duration changed to invalidate it, title should reflect new subject/paper
+         updatedFormState.title = deriveTitle(updatedFormState.subject, updatedFormState.paper);
+      }
+
+
+      if (newSelectedPresetId !== selectedPresetId) {
+        setSelectedPresetId(newSelectedPresetId);
       }
       
-      if (newSelectedPresetId !== selectedPresetId) {
-        setSelectedPresetId(newSelectedPresetId); // Update preset dropdown display
-      }
-      return newDetails;
+      return updatedFormState;
     });
-  };
+  }, [selectedPresetId, currentAppLanguage]);
   
   const handleExamLanguageChange = (lang: 'en' | 'zh-hk') => {
-    setDetails(prev => ({ ...prev, examLanguage: lang }));
+    setFormState(prev => ({ ...prev, examLanguage: lang }));
   };
 
   const handleSave = () => {
-    let finalDetails = { ...details };
-    
+    let finalDetails = { ...formState };
     const activePreset = examPresets.find(p => p.id === selectedPresetId);
 
-    // If a preset is still selected, it implies subject and duration match it.
     if (activePreset) {
-        finalDetails.title = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
+      // If a preset is still selected, it implies subject and duration match it.
+      // Use its localized title.
+      finalDetails.title = currentAppLanguage === 'zh-hk' ? activePreset.zhTitle : activePreset.enTitle;
+      finalDetails.subject = finalDetails.title; // Subject should also match preset title
+      // Paper can be custom even with a preset, title is primarily from preset.
     } else {
-        // Otherwise (no preset, or it was cleared due to edits), derive title from subject and paper.
-        const derivedTitle = (finalDetails.subject || "") + (finalDetails.paper ? ` ${finalDetails.paper}`.trimEnd() : "");
-        finalDetails.title = derivedTitle.trim();
+      // Manual mode: derive title from subject and paper.
+      finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper);
     }
 
-    // If title is still empty after derivation (e.g., subject and paper are empty), provide a default.
+    // If title is still empty (e.g., subject and paper are empty in manual mode), provide a default.
     if (!finalDetails.title.trim()) {
       finalDetails.title = language === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
@@ -143,25 +168,30 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
 
   const T = {
     modalTitle: language === 'zh-hk' ? '考試設定' : 'Exam Setup',
-    centreInformationTitle: language === 'zh-hk' ? '中心資訊' : 'Centre Information',
-    centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
-    centreNumberLabel: language === 'zh-hk' ? '中心編號:' : 'Centre Number:',
-    examDetailsTitle: language === 'zh-hk' ? '考試詳情' : 'Exam Details',
-    subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
-    paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
     selectPresetLabel: language === 'zh-hk' ? '選擇預設考試:' : 'Select Preset Exam:',
     selectPresetPlaceholder: language === 'zh-hk' ? '選擇或手動輸入...' : 'Select or input manually...',
     customPresetOption: language === 'zh-hk' ? '手動輸入' : 'Manual Input',
+    
+    centreInformationTitle: language === 'zh-hk' ? '中心資訊' : 'Centre Information',
+    centreNameLabel: language === 'zh-hk' ? '中心名稱:' : 'Centre Name:',
+    centreNumberLabel: language === 'zh-hk' ? '中心編號:' : 'Centre Number:',
+    
+    examDetailsTitle: language === 'zh-hk' ? '考試詳情' : 'Exam Details',
+    subjectLabel: language === 'zh-hk' ? '科目:' : 'Subject:',
+    paperLabel: language === 'zh-hk' ? '試卷:' : 'Paper:',
+    
     timingTitle: language === 'zh-hk' ? '時間安排' : 'Timing',
     durationMinutesLabel: language === 'zh-hk' ? '時長 (分鐘):' : 'Duration (Minutes):',
     examTimeLabel: language === 'zh-hk' ? '考試時間:' : 'Exam Time:',
     examStartTimeLabel: language === 'zh-hk' ? '由' : 'From',
     examEndTimeLabel: language === 'zh-hk' ? '至' : 'To',
+    
     examLanguageTitle: language === 'zh-hk' ? '試卷語言' : 'Exam Language',
     languageLabel: language === 'zh-hk' ? '語言:' : 'Language:',
-    langZhHkButton: language === 'zh-hk' ? '中文' : '中文', // For 'zh-hk'
+    langZhHkButton: language === 'zh-hk' ? '中文' : '中文',
     langEnButton: language === 'zh-hk' ? 'English' : 'English',
-    downloadAppButton: language === 'zh-hk' ? '下載應用程式' : 'Download App',
+    
+    downloadAppButton: language === 'zh-hk' ? '下載應用程式資訊' : 'App Install Info',
     cancelButton: language === 'zh-hk' ? '取消' : 'Cancel',
     confirmAndCloseButton: language === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
   };
@@ -205,11 +235,11 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               <h3 className="text-lg font-semibold text-foreground">{T.centreInformationTitle}</h3>
               <div>
                 <Label htmlFor="centreName" className="text-foreground/90">{T.centreNameLabel}</Label>
-                <Input id="centreName" name="centreName" value={details.centreName} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
+                <Input id="centreName" name="centreName" value={formState.centreName} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border" />
               </div>
               <div>
                 <Label htmlFor="centreNumber" className="text-foreground/90">{T.centreNumberLabel}</Label>
-                <Input id="centreNumber" name="centreNumber" value={details.centreNumber} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
+                <Input id="centreNumber" name="centreNumber" value={formState.centreNumber} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border" />
               </div>
             </div>
 
@@ -217,11 +247,11 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               <h3 className="text-lg font-semibold text-foreground">{T.examDetailsTitle}</h3>
               <div>
                 <Label htmlFor="subject" className="text-foreground/90">{T.subjectLabel}</Label>
-                <Input id="subject" name="subject" value={details.subject} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
+                <Input id="subject" name="subject" value={formState.subject} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border" />
               </div>
               <div>
                 <Label htmlFor="paper" className="text-foreground/90">{T.paperLabel}</Label>
-                <Input id="paper" name="paper" value={details.paper} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" />
+                <Input id="paper" name="paper" value={formState.paper} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border" />
               </div>
             </div>
 
@@ -229,14 +259,14 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               <h3 className="text-lg font-semibold text-foreground">{T.timingTitle}</h3>
               <div>
                 <Label htmlFor="durationMinutes" className="text-foreground/90">{T.durationMinutesLabel}</Label>
-                <Input id="durationMinutes" name="durationMinutes" type="number" value={details.durationMinutes} onChange={handleChange} className="mt-1 bg-input text-input-foreground border-border" min="0" />
+                <Input id="durationMinutes" name="durationMinutes" type="number" value={formState.durationMinutes} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border" min="0" />
               </div>
               <div>
                 <Label className="text-foreground/90">{T.examTimeLabel}</Label>
                 <div className="flex items-center space-x-2 mt-1">
-                  <Input id="examStartTime" name="examStartTime" type="time" value={details.examStartTime} onChange={handleChange} className="bg-input text-input-foreground border-border" aria-label={T.examStartTimeLabel} />
+                  <Input id="examStartTime" name="examStartTime" type="time" value={formState.examStartTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border" aria-label={T.examStartTimeLabel} />
                   <span>-</span>
-                  <Input id="examEndTime" name="examEndTime" type="time" value={details.examEndTime} onChange={handleChange} className="bg-input text-input-foreground border-border" aria-label={T.examEndTimeLabel}/>
+                  <Input id="examEndTime" name="examEndTime" type="time" value={formState.examEndTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border" aria-label={T.examEndTimeLabel}/>
                 </div>
               </div>
             </div>
@@ -246,14 +276,16 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
               <Label className="text-foreground/90">{T.languageLabel}</Label>
               <div className="flex space-x-2 mt-1">
                 <Button
-                  variant={details.examLanguage === 'zh-hk' ? 'default' : 'outline'}
+                  variant={formState.examLanguage === 'zh-hk' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('zh-hk')}
+                  className={formState.examLanguage === 'zh-hk' ? 'bg-primary text-primary-foreground' : ''}
                 >
                   {T.langZhHkButton}
                 </Button>
                 <Button
-                  variant={details.examLanguage === 'en' ? 'default' : 'outline'}
+                  variant={formState.examLanguage === 'en' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('en')}
+                  className={formState.examLanguage === 'en' ? 'bg-primary text-primary-foreground' : ''}
                 >
                   {T.langEnButton}
                 </Button>
@@ -274,6 +306,5 @@ export function ExamSetupModal({ isOpen, onClose, currentDetails, onSave, langua
     </Dialog>
   );
 }
-
 
     
