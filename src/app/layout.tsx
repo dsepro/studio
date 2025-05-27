@@ -11,10 +11,10 @@ import '@fontsource/inter/900.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Exam Info Board',
-  description: 'Exam Information and Timer Application',
-  manifest: '/manifest.json', // Link to the manifest file
-  themeColor: '#0ea5e9', // Moved theme-color here
+  title: 'Exam Info / 考試資訊',
+  description: 'Exam Info and Timer / 考試資訊及計時器',
+  manifest: '/manifest.json', 
+  themeColor: '#0ea5e9', 
 };
 
 export default function RootLayout({
@@ -30,8 +30,8 @@ export default function RootLayout({
       <body className="antialiased min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
-          defaultTheme="light" // Changed from "system"
-          enableSystem={false} // Changed from true
+          defaultTheme="light" 
+          enableSystem={false} 
           disableTransitionOnChange
         >
           {children}

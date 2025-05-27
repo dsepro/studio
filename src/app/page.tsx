@@ -31,7 +31,7 @@ const initialExamDetails: ExamDetails = {
   paper: "Paper 1",   
   durationMinutes: 90, 
   examStartTime: "08:30",
-  examEndTime: "10:00",
+  examEndTime: "10:00", // 08:30 + 90 minutes
   examLanguage: 'en',
 };
 
@@ -63,15 +63,14 @@ export default function Home() {
     setConfirmationState(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  const appTitle = language === 'zh-hk' ? '考試資訊板' : 'Exam Info Board';
-  const appFooterRights = language === 'zh-hk' ? '版權所有。' : 'All rights reserved.';
+  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Exam Info';
   const appFooterCreator = language === 'zh-hk' ? '由鍾永老師製作' : 'Created by Mr. Louis Chung';
 
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl"> {/* Increased width */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <MainClock />
@@ -89,11 +88,12 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-3xl p-4 md:p-6 lg:p-8"> {/* Increased width */}
+      <main className="flex-grow container mx-auto max-w-3xl p-4 md:p-6 lg:p-8">
         <div className="grid grid-cols-1 gap-6">
           <TimerCard 
             initialDurationMinutes={examDetails.durationMinutes}
             language={language}
+            onOpenConfirmation={handleOpenConfirmation}
           />
           <ExamInfoCard examDetails={examDetails} language={language} />
         </div>
@@ -101,7 +101,7 @@ export default function Home() {
 
       <footer className="py-6 text-center text-xs text-muted-foreground border-t">
         {appFooterCreator} <br />
-        © {new Date().getFullYear()} {appTitle}. {appFooterRights}
+        © {new Date().getFullYear()} {appTitle}
       </footer>
 
       <UserManualModal isOpen={isUserManualOpen} onClose={() => setIsUserManualOpen(false)} language={language} />

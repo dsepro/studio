@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import type { ExamDetails } from '@/app/page';
 import { ScrollArea } from './ui/scroll-area';
-// import { useToast } from "@/hooks/use-toast"; // Removed
 
 interface ExamSetupModalProps {
   isOpen: boolean;
@@ -25,11 +24,26 @@ interface ExamSetupModalProps {
   currentAppLanguage: string; 
 }
 
-const deriveTitle = (subject: string, paper: string): string => {
+const deriveTitle = (subject: string, paper: string, lang: string): string => {
   const s = subject?.trim() || "";
   const p = paper?.trim() || "";
-  if (!s && !p) return "";
+  if (!s && !p) return lang === 'zh-hk' ? '自訂考試' : 'Custom Exam';
   return `${s}${p ? ` ${p}` : ""}`.trim();
+};
+
+const calculateEndTime = (startTime: string, durationMinutes: number): string => {
+  if (!startTime || durationMinutes < 0) return "";
+  
+  const [startHours, startMinutes] = startTime.split(':').map(Number);
+  if (isNaN(startHours) || isNaN(startMinutes)) return "";
+
+  const totalStartMinutes = startHours * 60 + startMinutes;
+  const totalEndMinutes = totalStartMinutes + durationMinutes;
+
+  const endHours = Math.floor(totalEndMinutes / 60) % 24;
+  const endMinutes = totalEndMinutes % 60;
+
+  return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
 };
 
 export function ExamSetupModal({ 
@@ -40,47 +54,78 @@ export function ExamSetupModal({
   currentAppLanguage 
 }: ExamSetupModalProps) {
   const [formState, setFormState] = useState<ExamDetails>(currentDetails);
-  // const { toast } = useToast(); // Removed
 
   useEffect(() => {
     if (isOpen) {
-      let newTitle = currentDetails.title;
-      const derived = deriveTitle(currentDetails.subject, currentDetails.paper);
-      if (!newTitle && derived) {
-        newTitle = derived;
+      let initialStartTime = currentDetails.examStartTime || "08:30";
+      let initialDuration = currentDetails.durationMinutes >= 0 ? currentDetails.durationMinutes : 90;
+      let initialEndTime = currentDetails.examEndTime || calculateEndTime(initialStartTime, initialDuration);
+      
+      if (!currentDetails.examEndTime && initialStartTime && initialDuration >= 0) {
+        initialEndTime = calculateEndTime(initialStartTime, initialDuration);
       }
       
+      const initialTitle = currentDetails.title || deriveTitle(currentDetails.subject, currentDetails.paper, currentAppLanguage);
+
       setFormState({
         ...currentDetails,
-        title: newTitle,
+        title: initialTitle,
+        examStartTime: initialStartTime,
+        durationMinutes: initialDuration,
+        examEndTime: initialEndTime,
       });
     }
-  }, [currentDetails, isOpen]);
+  }, [currentDetails, isOpen, currentAppLanguage]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const isNumericField = name === "durationMinutes";
-    const newValue = isNumericField ? (Math.max(0, parseInt(value, 10)) || 0) : value;
-
+    
     setFormState(prevFormState => {
-      const updatedFormState = {
-        ...prevFormState,
-        [name]: newValue,
-      };
+      let newDuration = prevFormState.durationMinutes;
+      let newStartTime = prevFormState.examStartTime;
+      let newSubject = prevFormState.subject;
+      let newPaper = prevFormState.paper;
 
+      const updatedFormState = { ...prevFormState };
+
+      if (name === "durationMinutes") {
+        newDuration = Math.max(0, parseInt(value, 10) || 0);
+        updatedFormState.durationMinutes = newDuration;
+      } else if (name === "examStartTime") {
+        newStartTime = value;
+        updatedFormState.examStartTime = newStartTime;
+      } else if (name === "subject"){
+        newSubject = value;
+        updatedFormState.subject = newSubject;
+      } else if (name === "paper"){
+        newPaper = value;
+        updatedFormState.paper = newPaper;
+      } else {
+        updatedFormState[name as keyof ExamDetails] = value as any;
+      }
+      
       if (name === "subject" || name === "paper") {
-        updatedFormState.title = deriveTitle(updatedFormState.subject, updatedFormState.paper);
+        updatedFormState.title = deriveTitle(newSubject, newPaper, currentAppLanguage);
+      }
+
+      if (name === "examStartTime" || name === "durationMinutes") {
+        updatedFormState.examEndTime = calculateEndTime(newStartTime, newDuration);
       }
       
       return updatedFormState;
     });
-  }, []);
+  }, [currentAppLanguage]);
 
   const adjustDuration = (amount: number) => {
-    setFormState(prev => ({
-      ...prev,
-      durationMinutes: Math.max(0, (prev.durationMinutes || 0) + amount)
-    }));
+    setFormState(prev => {
+      const newDuration = Math.max(0, (prev.durationMinutes || 0) + amount);
+      const newEndTime = calculateEndTime(prev.examStartTime, newDuration);
+      return {
+        ...prev,
+        durationMinutes: newDuration,
+        examEndTime: newEndTime,
+      };
+    });
   };
   
   const handleExamLanguageChange = (lang: 'en' | 'zh-hk') => {
@@ -90,11 +135,14 @@ export function ExamSetupModal({
   const handleSave = () => {
     let finalDetails = { ...formState };
     
-    finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper);
-
+    // Ensure title is derived if it became empty or if subject/paper changed
+    finalDetails.title = deriveTitle(finalDetails.subject, finalDetails.paper, currentAppLanguage);
     if (!finalDetails.title.trim()) {
       finalDetails.title = currentAppLanguage === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
+
+    // Ensure end time is calculated
+    finalDetails.examEndTime = calculateEndTime(finalDetails.examStartTime, finalDetails.durationMinutes);
     
     onSave(finalDetails);
     onClose();
@@ -117,7 +165,6 @@ export function ExamSetupModal({
     languageLabel: currentAppLanguage === 'zh-hk' ? '語言:' : 'Language:',
     langZhHkButton: currentAppLanguage === 'zh-hk' ? '中文' : '中文',
     langEnButton: currentAppLanguage === 'zh-hk' ? 'English' : 'English',
-    // downloadAppButton: currentAppLanguage === 'zh-hk' ? '下載應用程式資訊' : 'App Install Info', // Removed
     cancelButton: currentAppLanguage === 'zh-hk' ? '取消' : 'Cancel',
     confirmAndCloseButton: currentAppLanguage === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
   };
@@ -212,7 +259,6 @@ export function ExamSetupModal({
           </div>
         </ScrollArea>
         <DialogFooter className="flex-col sm:flex-row sm:justify-end pt-4">
-          {/* Download App button removed from here */}
           <div className="flex space-x-2 w-full sm:w-auto">
             <Button variant="outline" onClick={onClose}>{T.cancelButton}</Button>
             <Button onClick={handleSave}>{T.confirmAndCloseButton}</Button>
