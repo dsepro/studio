@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import React, { useState, useEffect, useCallback } from "react";
-import { MainClock } from '@/components/main-clock'; // Import MainClock
+import { MainClock } from '@/components/main-clock';
 
 interface HeaderActionsProps {
   onOpenUserManual: () => void;
@@ -14,7 +14,7 @@ interface HeaderActionsProps {
   onFontScaleChange: (scale: number) => void;
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
-  language: string; // Add language prop for MainClock
+  language: string; 
 }
 
 const MIN_FONT_SCALE = 0.8;
@@ -28,7 +28,7 @@ export function HeaderActions({
   onFontScaleChange,
   currentLanguage,
   onLanguageChange,
-  language // Destructure language prop
+  language
 }: HeaderActionsProps) {
   const { setTheme, theme } = useTheme();
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -123,13 +123,12 @@ export function HeaderActions({
         <span className="sr-only">{T.toggleFullscreen}</span>
       </Button>
 
-      {/* Render MainClock here, before UserManual button */}
-      <MainClock language={language} className="text-sm font-medium" />
-
       <Button variant="outline" size="icon" onClick={onOpenUserManual} aria-label={T.openUserManual}>
         <Icons.BookOpenText className="h-5 w-5" />
         <span className="sr-only">{T.openUserManual}</span>
       </Button>
+      
+      <MainClock language={language} className="text-sm font-medium" />
     </div>
   );
 }
