@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   title: 'Exam Info Board',
   description: 'Exam Information and Timer Application',
   manifest: '/manifest.json', // Link to the manifest file
+  themeColor: '#0ea5e9', // Moved theme-color here
 };
 
 export default function RootLayout({
@@ -23,13 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#0ea5e9" /> {/* PWA theme color */}
+        {/* Custom head tags like theme-color and manifest are now handled by the metadata object */}
       </head>
       <body className="antialiased min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light" // Changed from "system"
+          enableSystem={false} // Changed from true
           disableTransitionOnChange
         >
           {children}
