@@ -9,8 +9,6 @@ import { ConfirmationDialog } from '@/components/confirmation-dialog';
 import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
 import useLocalStorage from '@/hooks/use-local-storage';
-// MainClock is now rendered within HeaderActions
-// import { MainClock } from '@/components/main-clock';
 
 
 export interface ExamDetails {
@@ -78,14 +76,14 @@ export default function Home() {
               <h1 className="text-xl font-semibold hidden sm:block">{appTitle}</h1>
             </div>
             <div className="flex items-center space-x-3">
-              {/* MainClock is now rendered within HeaderActions */}
               <HeaderActions
                 onOpenUserManual={() => setIsUserManualOpen(true)}
                 onOpenExamSetup={() => setIsExamSetupOpen(true)}
                 fontScale={fontScale}
                 onFontScaleChange={setFontScale}
-                currentLanguage={language} // Pass language to HeaderActions
+                currentLanguage={language}
                 onLanguageChange={setLanguage}
+                language={language} 
               />
             </div>
           </div>
