@@ -64,7 +64,6 @@ export default function Home() {
   }, []);
 
   const appFooterCreator = language === 'zh-hk' ? '由鍾永老師製作' : 'Created by Mr. Louis Chung';
-  const appTitle = language === 'zh-hk' ? '考試資訊' : 'Examination Information';
   const currentYear = new Date().getFullYear();
 
 
@@ -72,10 +71,8 @@ export default function Home() {
     <div className="relative flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold hidden sm:block">{appTitle}</h1>
-            </div>
+          <div className="flex items-center justify-end h-16"> {/* Changed justify-between to justify-end */}
+            {/* App title removed from here */}
             <div className="flex items-center space-x-1 md:space-x-2">
                <HeaderActions
                 onOpenUserManual={() => setIsUserManualOpen(true)}
@@ -84,7 +81,7 @@ export default function Home() {
                 onFontScaleChange={setFontScale}
                 currentLanguage={language}
                 onLanguageChange={setLanguage}
-                language={language}
+                language={language} 
               />
             </div>
           </div>
@@ -107,7 +104,7 @@ export default function Home() {
       </main>
 
       <footer className="py-4 text-center text-xs text-muted-foreground border-t">
-        {appFooterCreator} <br />
+        {appFooterCreator}
       </footer>
 
       <UserManualModal isOpen={isUserManualOpen} onClose={() => setIsUserManualOpen(false)} language={language} />
