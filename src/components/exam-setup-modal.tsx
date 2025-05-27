@@ -65,7 +65,7 @@ export function ExamSetupModal({
       if ((!currentDetails.examEndTime && initialStartTime && initialDuration >= 0) || (currentDetails.examEndTime !== calculateEndTime(initialStartTime, initialDuration))) {
         initialEndTime = calculateEndTime(initialStartTime, initialDuration);
       }
-
+      
       const initialTitle = currentDetails.title || deriveTitle(currentDetails.subject, currentDetails.paper, currentAppLanguage);
 
       setFormState({
@@ -156,39 +156,39 @@ export function ExamSetupModal({
         <DialogHeader>
           <DialogTitle className="text-2xl">{T.modalTitle}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[60vh] p-1 pr-3"> {/* Reduced right padding for scroll area */}
-          <div className="space-y-4 py-3 pr-1"> {/* Reduced py and pr, reduced space-y */}
+        <ScrollArea className="h-[60vh] p-1 pr-3">
+          <div className="space-y-3 py-3 pr-1"> {/* Reduced space-y */}
 
-            <div className="space-y-3 p-3 border rounded-md"> {/* Reduced p and space-y */}
+            <div className="space-y-2 p-3 border rounded-md"> {/* Reduced p and space-y */}
               <h3 className="text-lg font-semibold text-foreground">{T.centreInformationTitle}</h3>
               <div>
                 <Label htmlFor="centreName" className="text-foreground/90 text-sm">{T.centreNameLabel}</Label>
-                <Input id="centreName" name="centreName" value={formState.centreName} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border h-9 text-sm" /> {/* Reduced height and text size */}
+                <Input id="centreName" name="centreName" value={formState.centreName} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
               </div>
               <div>
                 <Label htmlFor="centreNumber" className="text-foreground/90 text-sm">{T.centreNumberLabel}</Label>
-                <Input id="centreNumber" name="centreNumber" value={formState.centreNumber} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border h-9 text-sm" />
+                <Input id="centreNumber" name="centreNumber" value={formState.centreNumber} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
               </div>
             </div>
 
-            <div className="space-y-3 p-3 border rounded-md">
+            <div className="space-y-2 p-3 border rounded-md">
               <h3 className="text-lg font-semibold text-foreground">{T.examDetailsTitle}</h3>
               <div>
                 <Label htmlFor="subject" className="text-foreground/90 text-sm">{T.subjectLabel}</Label>
-                <Input id="subject" name="subject" value={formState.subject} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border h-9 text-sm" />
+                <Input id="subject" name="subject" value={formState.subject} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
               </div>
               <div>
                 <Label htmlFor="paper" className="text-foreground/90 text-sm">{T.paperLabel}</Label>
-                <Input id="paper" name="paper" value={formState.paper} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border h-9 text-sm" />
+                <Input id="paper" name="paper" value={formState.paper} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
               </div>
             </div>
 
-            <div className="space-y-3 p-3 border rounded-md">
+            <div className="space-y-2 p-3 border rounded-md">
               <h3 className="text-lg font-semibold text-foreground">{T.timingTitle}</h3>
               <div>
                 <Label htmlFor="durationMinutes" className="text-foreground/90 text-sm">{T.durationMinutesLabel}</Label>
                 <div className="flex items-center space-x-2 mt-1">
-                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => adjustDuration(-1)} aria-label={currentAppLanguage === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
+                  <Button variant="outline" size="icon" onClick={() => adjustDuration(-1)} aria-label={currentAppLanguage === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
                     <Icons.Minus className="h-4 w-4" />
                   </Button>
                   <Input
@@ -197,10 +197,10 @@ export function ExamSetupModal({
                     type="number"
                     value={formState.durationMinutes}
                     onChange={handleInputChange}
-                    className="bg-input text-input-foreground border-border text-center flex-1 h-9 text-sm"
+                    className="bg-input text-input-foreground border-border text-center flex-1 text-sm"
                     min="0"
                   />
-                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => adjustDuration(1)} aria-label={currentAppLanguage === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
+                  <Button variant="outline" size="icon" onClick={() => adjustDuration(1)} aria-label={currentAppLanguage === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
                     <Icons.Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -208,28 +208,30 @@ export function ExamSetupModal({
               <div>
                 <Label className="text-foreground/90 text-sm">{T.examTimeLabel}</Label>
                 <div className="flex items-center space-x-2 mt-1">
-                  <Input id="examStartTime" name="examStartTime" type="time" value={formState.examStartTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border h-9 text-sm" aria-label={T.examStartTimeLabel} />
+                  <Input id="examStartTime" name="examStartTime" type="time" value={formState.examStartTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border text-sm" aria-label={T.examStartTimeLabel} />
                   <span className="text-sm">-</span>
-                  <Input id="examEndTime" name="examEndTime" type="time" value={formState.examEndTime} readOnly className="bg-input text-input-foreground border-border h-9 text-sm" aria-label={T.examEndTimeLabel}/>
+                  <Input id="examEndTime" name="examEndTime" type="time" value={formState.examEndTime} readOnly className="bg-input text-input-foreground border-border text-sm" aria-label={T.examEndTimeLabel}/>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2 p-3 border rounded-md"> {/* Reduced p */}
+            <div className="space-y-1 p-3 border rounded-md"> {/* Reduced p */}
               <h3 className="text-lg font-semibold text-foreground">{T.examLanguageTitle}</h3>
               <Label className="text-foreground/90 text-sm">{T.languageLabel}</Label>
               <div className="flex space-x-2 mt-1">
                 <Button
                   variant={formState.examLanguage === 'zh-hk' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('zh-hk')}
-                  size="sm" /* Smaller button */
+                  size="sm"
+                  className={formState.examLanguage === 'zh-hk' ? 'bg-primary text-primary-foreground' : ''}
                 >
                   {T.langZhHkButton}
                 </Button>
                 <Button
                   variant={formState.examLanguage === 'en' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('en')}
-                  size="sm" /* Smaller button */
+                  size="sm"
+                  className={formState.examLanguage === 'en' ? 'bg-primary text-primary-foreground' : ''}
                 >
                   {T.langEnButton}
                 </Button>
@@ -237,7 +239,7 @@ export function ExamSetupModal({
             </div>
           </div>
         </ScrollArea>
-        <DialogFooter className="flex-col sm:flex-row sm:justify-end pt-3"> {/* Reduced pt */}
+        <DialogFooter className="flex-col sm:flex-row sm:justify-end pt-3">
           <div className="flex space-x-2 w-full sm:w-auto">
             <Button variant="outline" onClick={onClose} size="sm">{T.cancelButton}</Button>
             <Button onClick={handleSave} size="sm">{T.confirmAndCloseButton}</Button>
