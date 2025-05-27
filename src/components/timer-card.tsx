@@ -42,7 +42,6 @@ export function TimerCard({ initialDurationMinutes = 135, onOpenConfirmation }: 
       }, 1000);
     } else if (timeLeft <= 0 && isRunning) {
       setIsRunning(false);
-      // Optionally, play a sound or show a notification
     }
     return () => clearInterval(timerId);
   }, [isRunning, timeLeft, setTimeLeft, setIsRunning]);
@@ -65,7 +64,6 @@ export function TimerCard({ initialDurationMinutes = 135, onOpenConfirmation }: 
   const adjustCurrentTime = (seconds: number) => {
     setTimeLeft(prevTime => {
       const newTime = prevTime + seconds;
-      // Ensure time doesn't go below 0 or exceed initial total seconds
       return Math.max(0, Math.min(newTime, initialTotalSeconds));
     });
   };
@@ -73,7 +71,7 @@ export function TimerCard({ initialDurationMinutes = 135, onOpenConfirmation }: 
   const progressPercentage = initialTotalSeconds > 0 ? (timeLeft / initialTotalSeconds) * 100 : 0;
 
   return (
-    <Card className="h-full flex flex-col shadow-lg">
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl text-center">Time Left</CardTitle>
       </CardHeader>
@@ -83,38 +81,44 @@ export function TimerCard({ initialDurationMinutes = 135, onOpenConfirmation }: 
           {formatTime(timeLeft)}
         </div>
         <Progress value={progressPercentage} className="w-full h-3" />
-        <div className="grid grid-cols-3 gap-2 w-full max-w-md">
-          <Button onClick={handleStart} disabled={isRunning || timeLeft === 0} variant="default" className="col-span-1 bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Icons.Play className="mr-2 h-5 w-5" /> Start
-          </Button>
-          <Button onClick={handleStop} disabled={!isRunning} variant="secondary" className="col-span-1">
-            <Icons.Pause className="mr-2 h-5 w-5" /> Stop
-          </Button>
-          <Button onClick={handleReset} variant="destructive" className="col-span-1">
-            <Icons.RotateCcw className="mr-2 h-5 w-5" /> Reset
-          </Button>
-        </div>
+        
+        <div className="flex items-center justify-center space-x-1 w-full max-w-md">
+          {/* Minus Buttons */}
+          <div className="flex flex-col space-y-1">
+            <Button onClick={() => adjustCurrentTime(-300)} variant="outline" size="sm" disabled={isRunning} className="px-2">
+              <Icons.Minus className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">5m</span>
+            </Button>
+             <Button onClick={() => adjustCurrentTime(-60)} variant="outline" size="sm" disabled={isRunning} className="px-2">
+              <Icons.Minus className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">1m</span>
+            </Button>
+            <Button onClick={() => adjustCurrentTime(-30)} variant="outline" size="sm" disabled={isRunning} className="px-2">
+              <Icons.Minus className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">30s</span>
+            </Button>
+          </div>
 
-        <div className="mt-4 pt-4 border-t border-border w-full max-w-md space-y-2">
-          <p className="text-sm font-medium text-center text-muted-foreground">Adjust Current Time</p>
-          <div className="grid grid-cols-3 gap-2">
-            <Button onClick={() => adjustCurrentTime(300)} variant="outline" size="sm" disabled={isRunning}>
-              <Icons.Plus className="mr-1 h-4 w-4" />5m
+          {/* Main Controls */}
+          <div className="flex flex-col space-y-1 flex-grow px-1">
+            <Button onClick={handleStart} disabled={isRunning || timeLeft === 0} variant="default" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Icons.Play className="mr-2 h-5 w-5" /> Start
             </Button>
-            <Button onClick={() => adjustCurrentTime(60)} variant="outline" size="sm" disabled={isRunning}>
-              <Icons.Plus className="mr-1 h-4 w-4" />1m
+            <Button onClick={handleStop} disabled={!isRunning} variant="secondary" className="w-full">
+              <Icons.Pause className="mr-2 h-5 w-5" /> Stop
             </Button>
-            <Button onClick={() => adjustCurrentTime(30)} variant="outline" size="sm" disabled={isRunning}>
-              <Icons.Plus className="mr-1 h-4 w-4" />30s
+            <Button onClick={handleReset} variant="destructive" className="w-full">
+              <Icons.RotateCcw className="mr-2 h-5 w-5" /> Reset
             </Button>
-            <Button onClick={() => adjustCurrentTime(-300)} variant="outline" size="sm" disabled={isRunning}>
-              <Icons.Minus className="mr-1 h-4 w-4" />5m
+          </div>
+
+          {/* Plus Buttons */}
+          <div className="flex flex-col space-y-1">
+            <Button onClick={() => adjustCurrentTime(300)} variant="outline" size="sm" disabled={isRunning} className="px-2">
+              <Icons.Plus className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">5m</span>
             </Button>
-            <Button onClick={() => adjustCurrentTime(-60)} variant="outline" size="sm" disabled={isRunning}>
-              <Icons.Minus className="mr-1 h-4 w-4" />1m
+            <Button onClick={() => adjustCurrentTime(60)} variant="outline" size="sm" disabled={isRunning} className="px-2">
+              <Icons.Plus className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">1m</span>
             </Button>
-            <Button onClick={() => adjustCurrentTime(-30)} variant="outline" size="sm" disabled={isRunning}>
-              <Icons.Minus className="mr-1 h-4 w-4" />30s
+            <Button onClick={() => adjustCurrentTime(30)} variant="outline" size="sm" disabled={isRunning} className="px-2">
+              <Icons.Plus className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">30s</span>
             </Button>
           </div>
         </div>

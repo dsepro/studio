@@ -6,7 +6,7 @@ import { MainClock } from '@/components/main-clock';
 import { HeaderActions } from '@/components/header-actions';
 import { ExamInfoCard } from '@/components/exam-info-card';
 import { TimerCard } from '@/components/timer-card';
-import { SettingsCard } from '@/components/settings-card';
+// import { SettingsCard } from '@/components/settings-card'; // SettingsCard removed
 import { ConfirmationDialog } from '@/components/confirmation-dialog';
 import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
@@ -62,7 +62,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <MainClock />
@@ -71,6 +71,8 @@ export default function Home() {
             <HeaderActions 
               onOpenUserManual={() => setIsUserManualOpen(true)}
               onOpenExamSetup={() => setIsExamSetupOpen(true)} 
+              fontScale={fontScale}
+              onFontScaleChange={setFontScale}
             />
           </div>
         </div>
@@ -83,10 +85,11 @@ export default function Home() {
             initialDurationMinutes={parseDurationToMinutes(examDetails.timeAllowed)} 
           />
           <ExamInfoCard examDetails={examDetails} />
-          <SettingsCard
+          {/* SettingsCard removed as its functionality (font scale) is moved to header */}
+          {/* <SettingsCard
             fontScale={fontScale}
             onFontScaleChange={setFontScale}
-          />
+          /> */}
         </div>
       </main>
 
@@ -112,8 +115,6 @@ export default function Home() {
   );
 }
 
-// Helper function to parse time string like "X hours Y minutes" to total minutes
-// This is a simplified parser.
 function parseDurationToMinutes(durationStr: string): number {
   let totalMinutes = 0;
   const hoursMatch = durationStr.match(/(\d+)\s*hours?/i);
@@ -126,6 +127,5 @@ function parseDurationToMinutes(durationStr: string): number {
     totalMinutes += parseInt(minutesMatch[1], 10);
   }
   
-  // Default to 135 minutes (2h 15m) if parsing fails or results in 0
   return totalMinutes > 0 ? totalMinutes : 135;
 }

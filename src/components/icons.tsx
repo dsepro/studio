@@ -1,3 +1,4 @@
+
 import type { LucideProps } from 'lucide-react';
 import {
   Moon,
@@ -25,6 +26,8 @@ import {
   Edit3,
   Save,
   Trash2,
+  ALargeSmall, // Added
+  Download,    // Added
 } from 'lucide-react';
 
 export type Icon = React.FC<LucideProps>;
@@ -55,6 +58,8 @@ export const Icons = {
   EditIcon: Edit3,
   SaveIcon: Save,
   DeleteIcon: Trash2,
+  ALargeSmall, // Added
+  Download,    // Added
 };
 
 export default Icons;
