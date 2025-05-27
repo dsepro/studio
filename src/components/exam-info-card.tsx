@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ExamDetails } from '@/app/page'; 
-import { formatDurationFromMinutes } from "@/lib/exam-presets";
+import { formatDurationFromMinutes } from "@/lib/utils"; // Updated import
 
 interface ExamInfoCardProps {
   examDetails: ExamDetails;

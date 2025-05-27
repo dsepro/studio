@@ -10,10 +10,10 @@ import { ConfirmationDialog } from '@/components/confirmation-dialog';
 import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
 import useLocalStorage from '@/hooks/use-local-storage';
-import { formatDurationFromMinutes } from '@/lib/exam-presets';
+// Removed formatDurationFromMinutes import as it's no longer used here directly
 
 export interface ExamDetails {
-  title: string; // Main title, often from preset or derived
+  title: string;
   centreName: string;
   centreNumber: string;
   subject: string;
@@ -25,14 +25,14 @@ export interface ExamDetails {
 }
 
 const initialExamDetails: ExamDetails = {
-  title: "DSE Mathematics Compulsory Part Paper 1",
-  centreName: "", // "ABC Secondary School",
-  centreNumber: "", // "A1234",
-  subject: "Mathematics Compulsory Part",
-  paper: "Paper 1",
-  durationMinutes: 135, // 2 hours 15 minutes
-  examStartTime: "08:30",
-  examEndTime: "10:45",
+  title: "Custom Exam", // Generic title
+  centreName: "", 
+  centreNumber: "", 
+  subject: "Custom Subject", // Generic subject
+  paper: "Custom Paper",   // Generic paper
+  durationMinutes: 60, // Default duration
+  examStartTime: "09:00",
+  examEndTime: "10:00",
   examLanguage: 'en',
 };
 
@@ -71,7 +71,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl"> {/* Adjusted max-width for content */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <MainClock />
@@ -89,7 +89,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8"> {/* Consistent max-width */}
+      <main className="flex-grow container mx-auto max-w-2xl p-4 md:p-6 lg:p-8">
         <div className="grid grid-cols-1 gap-6">
           <TimerCard 
             initialDurationMinutes={examDetails.durationMinutes}
@@ -109,7 +109,7 @@ export default function Home() {
         onClose={() => setIsExamSetupOpen(false)}
         currentDetails={examDetails}
         onSave={(newDetails) => setExamDetails(newDetails)}
-        language={language} // app display language
+        language={language} 
         currentAppLanguage={language}
       />
       <ConfirmationDialog
@@ -123,8 +123,3 @@ export default function Home() {
     </div>
   );
 }
-
-// This function is no longer needed here as duration is stored in minutes.
-// formatting will be done in ExamInfoCard or where needed.
-// function parseDurationToMinutes(durationStr: string): number { ... }
-
