@@ -120,7 +120,7 @@ export default function Home() {
           onClick={() => setIsTopBarHidden(false)}
           aria-label={language === 'zh-hk' ? '顯示頂部工具列' : 'Show top bar'}
           title={language === 'zh-hk' ? '顯示頂部工具列 (H)' : 'Show top bar (H)'}
-          className="fixed right-3 top-3 z-50 h-[44px] w-[44px] rounded-lg border bg-background/70 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-accent hover:text-foreground"
+          className="fixed right-3 top-3 z-50 h-[44px] w-[44px] rounded-lg border border-border bg-background/85 text-foreground/70 shadow-sm backdrop-blur transition-colors hover:bg-accent hover:text-foreground"
         >
           <Icons.ChevronDown className="h-5 w-5" />
         </Button>
