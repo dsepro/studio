@@ -176,19 +176,19 @@ export function ExamSetupModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <DialogContent className="w-[calc(100%-1.5rem)] p-5 sm:max-w-3xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-3"
           onSubmit={(event) => {
             event.preventDefault();
             handleSave();
           }}
         >
           <DialogHeader>
-            <DialogTitle className="text-xl">{T.modalTitle}</DialogTitle>
+            <DialogTitle>{T.modalTitle}</DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-2">
             <div className={FIELD_ROW_CLASS}>
               <Label htmlFor="centreName" className={LABEL_CLASS}>{T.centreNameLabel}</Label>
               <Input id="centreName" name="centreName" value={formState.centreName} onChange={handleInputChange} className={CONTROL_CLASS} />
@@ -287,7 +287,7 @@ export function ExamSetupModal({
               </div>
             </div>
 
-            <div className={FIELD_ROW_CLASS}>
+            <div className={FIELD_ROW_CLASS} title={T.examInfoTextSizeHint}>
               <span className={LABEL_CLASS} id="exam-info-text-size-label">{T.examInfoTextSizeLabel}</span>
               <div className="flex flex-wrap gap-1.5" role="group" aria-labelledby="exam-info-text-size-label">
                 {EXAM_INFO_TEXT_SCALES.map((scale, index) => {
@@ -309,8 +309,6 @@ export function ExamSetupModal({
               </div>
             </div>
           </div>
-
-          <p className="text-xs text-muted-foreground">{T.examInfoTextSizeHint}</p>
 
           <DialogFooter className="gap-2 pt-1">
             <Button type="button" variant="outline" onClick={onClose}>{T.cancelButton}</Button>
