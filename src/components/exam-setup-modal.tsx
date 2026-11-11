@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import type { ExamDetails } from '@/app/page';
 import { EXAM_INFO_TEXT_SCALES } from './exam-info-card';
-import { ScrollArea } from './ui/scroll-area';
 
 // Helper to derive title from subject and paper
 const deriveTitle = (subject: string, paper: string, lang: string): string => {
@@ -39,6 +38,14 @@ const calculateEndTime = (startTime: string, durationMinutes: number): string =>
 
   return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
 };
+
+const DURATION_PRESETS = [30, 45, 60, 90, 120];
+
+// One row per field: label on the left, control on the right, so the whole
+// form fits on a single screen without an inner scroll area.
+const FIELD_ROW_CLASS = "grid grid-cols-[max-content_1fr] items-center gap-x-3 gap-y-2";
+const LABEL_CLASS = "text-sm font-medium text-foreground/80";
+const CONTROL_CLASS = "h-9 bg-input text-input-foreground border-border";
 
 interface ExamSetupModalProps {
   isOpen: boolean;
@@ -71,7 +78,7 @@ export function ExamSetupModal({
       if ((!currentDetails.examEndTime && initialStartTime && initialDuration >= 0) || (currentDetails.examEndTime !== calculateEndTime(initialStartTime, initialDuration))) {
         initialEndTime = calculateEndTime(initialStartTime, initialDuration);
       }
-      
+
       const initialTitle = currentDetails.title || deriveTitle(currentDetails.subject, currentDetails.paper, currentAppLanguage);
 
       setFormState({
@@ -106,6 +113,15 @@ export function ExamSetupModal({
     });
   }, [currentAppLanguage]);
 
+  const applyDuration = (minutes: number) => {
+    const safeMinutes = Math.max(0, Math.round(minutes));
+    setFormState(prev => ({
+      ...prev,
+      durationMinutes: safeMinutes,
+      examEndTime: calculateEndTime(prev.examStartTime, safeMinutes),
+    }));
+  };
+
   const adjustDuration = (amount: number) => {
     setFormState(prev => {
       const newDuration = Math.max(0, (prev.durationMinutes || 0) + amount);
@@ -137,146 +153,170 @@ export function ExamSetupModal({
 
   const T = {
     modalTitle: currentAppLanguage === 'zh-hk' ? '考試設定' : 'Exam Setup',
-    centreInformationTitle: currentAppLanguage === 'zh-hk' ? '中心資訊' : 'Centre Information',
-    centreNameLabel: currentAppLanguage === 'zh-hk' ? '考埸名稱:' : 'Centre Name:',
-    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考埸編號:' : 'Centre Number:',
-    examDetailsTitle: currentAppLanguage === 'zh-hk' ? '考試詳情' : 'Exam Details',
+    centreNameLabel: currentAppLanguage === 'zh-hk' ? '考場名稱:' : 'Centre Name:',
+    centreNumberLabel: currentAppLanguage === 'zh-hk' ? '考場編號:' : 'Centre Number:',
     subjectLabel: currentAppLanguage === 'zh-hk' ? '科目:' : 'Subject:',
     paperLabel: currentAppLanguage === 'zh-hk' ? '試卷:' : 'Paper:',
-    timingTitle: currentAppLanguage === 'zh-hk' ? '時間安排' : 'Timing',
-    durationMinutesLabel: currentAppLanguage === 'zh-hk' ? '時長 (分鐘):' : 'Duration (Minutes):',
-    examTimeLabel: currentAppLanguage === 'zh-hk' ? '考試時間:' : 'Exam Time:',
-    examStartTimeLabel: currentAppLanguage === 'zh-hk' ? '由' : 'From',
-    examEndTimeLabel: currentAppLanguage === 'zh-hk' ? '至' : 'To',
-    examLanguageTitle: currentAppLanguage === 'zh-hk' ? '試卷語言' : 'Exam Language',
+    durationLabel: currentAppLanguage === 'zh-hk' ? '時長:' : 'Duration:',
+    minutesSuffix: currentAppLanguage === 'zh-hk' ? '分鐘' : 'min',
+    quickDurationLabel: currentAppLanguage === 'zh-hk' ? '常用時長' : 'Common durations',
+    startTimeLabel: currentAppLanguage === 'zh-hk' ? '開始時間:' : 'Starts:',
+    endTimeLabel: currentAppLanguage === 'zh-hk' ? '結束時間' : 'Ends',
+    endTimeAutoHint: currentAppLanguage === 'zh-hk' ? '(自動)' : '(auto)',
     languageLabel: currentAppLanguage === 'zh-hk' ? '語言:' : 'Language:',
-    langZhHkButton: currentAppLanguage === 'zh-hk' ? '中文' : '中文',
-    langEnButton: currentAppLanguage === 'zh-hk' ? 'English' : 'English',
-    displayTitle: currentAppLanguage === 'zh-hk' ? '顯示' : 'Display',
+    langZhHkButton: '中文',
+    langEnButton: 'English',
     examInfoTextSizeLabel: currentAppLanguage === 'zh-hk' ? '考試資訊字型:' : 'Exam Info Text Size:',
     examInfoTextSizeHint: currentAppLanguage === 'zh-hk' ? '只影響「考試資訊」卡片，不影響計時器。' : 'Affects the "Examination Information" card only, not the timer.',
     cancelButton: currentAppLanguage === 'zh-hk' ? '取消' : 'Cancel',
-    confirmAndCloseButton: currentAppLanguage === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
+    saveButton: currentAppLanguage === 'zh-hk' ? '儲存' : 'Save',
   };
 
   if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">{T.modalTitle}</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="h-[60vh] p-1 pr-3">
-          <div className="space-y-3 py-3 pr-1"> {/* Reduced space-y */}
+      <DialogContent className="sm:max-w-3xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSave();
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-xl">{T.modalTitle}</DialogTitle>
+          </DialogHeader>
 
-            <div className="space-y-2 p-3 border rounded-md"> {/* Reduced p and space-y */}
-              <h3 className="text-lg font-semibold text-foreground">{T.centreInformationTitle}</h3>
-              <div>
-                <Label htmlFor="centreName" className="text-foreground/90 text-sm">{T.centreNameLabel}</Label>
-                <Input id="centreName" name="centreName" value={formState.centreName} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
+          <div className="grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2">
+            <div className={FIELD_ROW_CLASS}>
+              <Label htmlFor="centreName" className={LABEL_CLASS}>{T.centreNameLabel}</Label>
+              <Input id="centreName" name="centreName" value={formState.centreName} onChange={handleInputChange} className={CONTROL_CLASS} />
+            </div>
+
+            <div className={FIELD_ROW_CLASS}>
+              <Label htmlFor="centreNumber" className={LABEL_CLASS}>{T.centreNumberLabel}</Label>
+              <Input id="centreNumber" name="centreNumber" value={formState.centreNumber} onChange={handleInputChange} className={CONTROL_CLASS} />
+            </div>
+
+            <div className={FIELD_ROW_CLASS}>
+              <Label htmlFor="subject" className={LABEL_CLASS}>{T.subjectLabel}</Label>
+              <Input id="subject" name="subject" value={formState.subject} onChange={handleInputChange} className={CONTROL_CLASS} />
+            </div>
+
+            <div className={FIELD_ROW_CLASS}>
+              <Label htmlFor="paper" className={LABEL_CLASS}>{T.paperLabel}</Label>
+              <Input id="paper" name="paper" value={formState.paper} onChange={handleInputChange} className={CONTROL_CLASS} />
+            </div>
+
+            <div className={FIELD_ROW_CLASS}>
+              <Label htmlFor="durationMinutes" className={LABEL_CLASS}>{T.durationLabel}</Label>
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => adjustDuration(-1)} aria-label={currentAppLanguage === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
+                  <Icons.Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  id="durationMinutes"
+                  name="durationMinutes"
+                  type="number"
+                  value={formState.durationMinutes}
+                  onChange={handleInputChange}
+                  className={`${CONTROL_CLASS} w-16 text-center`}
+                  min="0"
+                />
+                <span className="text-sm text-muted-foreground">{T.minutesSuffix}</span>
+                <Button type="button" variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => adjustDuration(1)} aria-label={currentAppLanguage === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
+                  <Icons.Plus className="h-4 w-4" />
+                </Button>
               </div>
-              <div>
-                <Label htmlFor="centreNumber" className="text-foreground/90 text-sm">{T.centreNumberLabel}</Label>
-                <Input id="centreNumber" name="centreNumber" value={formState.centreNumber} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
+
+              <div aria-hidden="true" />
+              <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={T.quickDurationLabel}>
+                {DURATION_PRESETS.map((minutes) => {
+                  const isActive = formState.durationMinutes === minutes;
+                  return (
+                    <Button
+                      key={minutes}
+                      type="button"
+                      variant={isActive ? 'default' : 'outline'}
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      aria-pressed={isActive}
+                      onClick={() => applyDuration(minutes)}
+                    >
+                      {minutes}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="space-y-2 p-3 border rounded-md">
-              <h3 className="text-lg font-semibold text-foreground">{T.examDetailsTitle}</h3>
-              <div>
-                <Label htmlFor="subject" className="text-foreground/90 text-sm">{T.subjectLabel}</Label>
-                <Input id="subject" name="subject" value={formState.subject} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
-              </div>
-              <div>
-                <Label htmlFor="paper" className="text-foreground/90 text-sm">{T.paperLabel}</Label>
-                <Input id="paper" name="paper" value={formState.paper} onChange={handleInputChange} className="mt-1 bg-input text-input-foreground border-border text-sm" />
-              </div>
-            </div>
-
-            <div className="space-y-2 p-3 border rounded-md">
-              <h3 className="text-lg font-semibold text-foreground">{T.timingTitle}</h3>
-              <div>
-                <Label htmlFor="durationMinutes" className="text-foreground/90 text-sm">{T.durationMinutesLabel}</Label>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Button variant="outline" size="icon" onClick={() => adjustDuration(-1)} aria-label={currentAppLanguage === 'zh-hk' ? '減少1分鐘' : 'Decrease 1 minute'}>
-                    <Icons.Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    id="durationMinutes"
-                    name="durationMinutes"
-                    type="number"
-                    value={formState.durationMinutes}
-                    onChange={handleInputChange}
-                    className="bg-input text-input-foreground border-border text-center flex-1 text-sm"
-                    min="0"
-                  />
-                  <Button variant="outline" size="icon" onClick={() => adjustDuration(1)} aria-label={currentAppLanguage === 'zh-hk' ? '增加1分鐘' : 'Increase 1 minute'}>
-                    <Icons.Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div>
-                <Label className="text-foreground/90 text-sm">{T.examTimeLabel}</Label>
-                <div className="flex items-center space-x-2 mt-1">
-                  <Input id="examStartTime" name="examStartTime" type="time" value={formState.examStartTime} onChange={handleInputChange} className="bg-input text-input-foreground border-border text-sm" aria-label={T.examStartTimeLabel} />
-                  <span className="text-sm">-</span>
-                  <Input id="examEndTime" name="examEndTime" type="time" value={formState.examEndTime} readOnly className="bg-input text-input-foreground border-border text-sm" aria-label={T.examEndTimeLabel}/>
-                </div>
+            <div className={FIELD_ROW_CLASS}>
+              <Label htmlFor="examStartTime" className={LABEL_CLASS}>{T.startTimeLabel}</Label>
+              <div className="flex min-w-0 items-center gap-2">
+                <Input id="examStartTime" name="examStartTime" type="time" value={formState.examStartTime} onChange={handleInputChange} className={`${CONTROL_CLASS} min-w-0 w-[7.5rem] shrink`} />
+                <span className="shrink-0 text-muted-foreground" aria-hidden="true">&#8594;</span>
+                <span className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums text-foreground/80" aria-label={`${T.endTimeLabel} ${formState.examEndTime}`}>
+                  {formState.examEndTime || '--:--'}
+                </span>
+                <span className="hidden text-xs text-muted-foreground sm:inline">{T.endTimeAutoHint}</span>
               </div>
             </div>
 
-            <div className="space-y-1 p-3 border rounded-md"> {/* Reduced p */}
-              <h3 className="text-lg font-semibold text-foreground">{T.examLanguageTitle}</h3>
-              <Label className="text-foreground/90 text-sm">{T.languageLabel}</Label>
-              <div className="flex space-x-2 mt-1">
+            <div className={FIELD_ROW_CLASS}>
+              <span className={LABEL_CLASS} id="exam-language-label">{T.languageLabel}</span>
+              <div className="flex flex-wrap gap-2" role="group" aria-labelledby="exam-language-label">
                 <Button
+                  type="button"
                   variant={formState.examLanguage === 'zh-hk' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('zh-hk')}
                   size="sm"
-                  className={formState.examLanguage === 'zh-hk' ? 'bg-primary text-primary-foreground' : ''}
+                  aria-pressed={formState.examLanguage === 'zh-hk'}
                 >
                   {T.langZhHkButton}
                 </Button>
                 <Button
+                  type="button"
                   variant={formState.examLanguage === 'en' ? 'default' : 'outline'}
                   onClick={() => handleExamLanguageChange('en')}
                   size="sm"
-                  className={formState.examLanguage === 'en' ? 'bg-primary text-primary-foreground' : ''}
+                  aria-pressed={formState.examLanguage === 'en'}
                 >
                   {T.langEnButton}
                 </Button>
               </div>
             </div>
 
-            <div className="space-y-2 p-3 border rounded-md">
-              <h3 className="text-lg font-semibold text-foreground">{T.displayTitle}</h3>
-              <div>
-                <Label className="text-foreground/90 text-sm">{T.examInfoTextSizeLabel}</Label>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {EXAM_INFO_TEXT_SCALES.map((scale, index) => (
+            <div className={FIELD_ROW_CLASS}>
+              <span className={LABEL_CLASS} id="exam-info-text-size-label">{T.examInfoTextSizeLabel}</span>
+              <div className="flex flex-wrap gap-1.5" role="group" aria-labelledby="exam-info-text-size-label">
+                {EXAM_INFO_TEXT_SCALES.map((scale, index) => {
+                  const isActive = textSizeStep === index;
+                  return (
                     <Button
                       key={scale}
-                      variant={textSizeStep === index ? 'default' : 'outline'}
+                      type="button"
+                      variant={isActive ? 'default' : 'outline'}
                       onClick={() => setTextSizeStep(index)}
                       size="sm"
-                      aria-pressed={textSizeStep === index}
+                      className="h-7 px-2 text-xs"
+                      aria-pressed={isActive}
                     >
                       {Math.round(scale * 100)}%
                     </Button>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">{T.examInfoTextSizeHint}</p>
+                  );
+                })}
               </div>
             </div>
           </div>
-        </ScrollArea>
-        <DialogFooter className="flex-col sm:flex-row sm:justify-end pt-3">
-          <div className="flex space-x-2 w-full sm:w-auto">
-            <Button variant="outline" onClick={onClose} size="sm">{T.cancelButton}</Button>
-            <Button onClick={handleSave} size="sm">{T.confirmAndCloseButton}</Button>
-          </div>
-        </DialogFooter>
+
+          <p className="text-xs text-muted-foreground">{T.examInfoTextSizeHint}</p>
+
+          <DialogFooter className="gap-2 pt-1">
+            <Button type="button" variant="outline" onClick={onClose}>{T.cancelButton}</Button>
+            <Button type="submit">{T.saveButton}</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
