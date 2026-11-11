@@ -28,6 +28,8 @@ import {
   Trash2,
   ALargeSmall, // Added
   Download,    // Added
+  ChevronUp,   // Added
+  ChevronDown, // Added
 } from 'lucide-react';
 
 export type Icon = React.FC<LucideProps>;
@@ -60,6 +62,8 @@ export const Icons = {
   DeleteIcon: Trash2,
   ALargeSmall, // Added
   Download,    // Added
+  ChevronUp,   // Added
+  ChevronDown, // Added
 };
 
 export default Icons;

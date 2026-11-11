@@ -1,5 +1,5 @@
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import '@fontsource/inter/300.css';
@@ -13,8 +13,22 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Examination Information / 考試資訊',
   description: 'Examination Information and Timer / 考試資訊及計時器',
-  manifest: '/manifest.json', 
-  themeColor: '#0ea5e9', 
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+  },
+};
+
+// Explicit viewport: without it iOS/iPadOS applies its own width and text
+// inflation, which is what makes the layout look "shifted" on an iPad.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: '#0ea5e9',
 };
 
 export default function RootLayout({
@@ -27,7 +41,7 @@ export default function RootLayout({
       <head>
         {/* Custom head tags like theme-color and manifest are now handled by the metadata object */}
       </head>
-      <body className="antialiased min-h-screen flex flex-col">
+      <body className="antialiased min-h-[100dvh] flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="light" 
