@@ -41,6 +41,8 @@ export default function Home() {
   const [fontScale, setFontScale] = useLocalStorage<number>('fontScale', 1);
   const [examDetails, setExamDetails] = useLocalStorage<ExamDetails>('examDetails', initialExamDetails);
   const [language, setLanguage] = useLocalStorage<string>('language', 'zh-hk'); 
+  // Exam-info text size (step index into EXAM_INFO_TEXT_SCALES); changed via Exam Setup.
+  const [examInfoTextStep, setExamInfoTextStep] = useLocalStorage<number>('examInfoTextStep', 0);
 
   const [isUserManualOpen, setIsUserManualOpen] = useState(false);
   const [isExamSetupOpen, setIsExamSetupOpen] = useState(false);
@@ -137,6 +139,7 @@ export default function Home() {
               key={`exam-info-${language}`} 
               examDetails={examDetails}
               language={language}
+              textStep={examInfoTextStep}
             />
           </div>
         </div>
@@ -157,6 +160,8 @@ export default function Home() {
           // This assumes TimerCard will pick up new initialDurationMinutes if it's not running
         }}
         currentAppLanguage={language}
+        examInfoTextStep={examInfoTextStep}
+        onExamInfoTextStepChange={setExamInfoTextStep}
       />
       <ConfirmationDialog
         isOpen={confirmationState.isOpen}

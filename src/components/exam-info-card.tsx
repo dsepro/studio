@@ -3,32 +3,28 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
-import useLocalStorage from "@/hooks/use-local-storage";
 import type { ExamDetails } from '@/app/page';
 import { formatDurationFromMinutes } from "@/lib/utils";
 
 interface ExamInfoCardProps {
   examDetails: ExamDetails;
   language: string;
+  textStep?: number;
 }
 
-// Exam-info-only text size steps. The header +/- still scales the whole app;
-// this control only scales this card, so students can read the details from
-// the back of the room without shrinking/oversizing the timer.
-const TEXT_SCALES = [1, 1.15, 1.3, 1.5];
+// Exam-info-only text size steps. The value is chosen in "Exam Setup" so the
+// card itself carries no visible control on the projector.
+export const EXAM_INFO_TEXT_SCALES = [1, 1.15, 1.3, 1.5];
 
 const LABEL_CLASS = "text-[0.95em] font-semibold leading-snug text-foreground";
 const VALUE_CLASS = "text-[1.15em] font-medium leading-snug text-foreground";
 
-export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
-  const [storedTextStep, setTextStep] = useLocalStorage<number>('examInfoTextStep', 0);
-  const parsedStep = Number(storedTextStep);
-  const textStep = Number.isFinite(parsedStep)
-    ? Math.min(Math.max(Math.round(parsedStep), 0), TEXT_SCALES.length - 1)
+export function ExamInfoCard({ examDetails, language, textStep = 0 }: ExamInfoCardProps) {
+  const parsedStep = Number(textStep);
+  const safeStep = Number.isFinite(parsedStep)
+    ? Math.min(Math.max(Math.round(parsedStep), 0), EXAM_INFO_TEXT_SCALES.length - 1)
     : 0;
-  const textScale = TEXT_SCALES[textStep];
+  const textScale = EXAM_INFO_TEXT_SCALES[safeStep];
 
   const T = {
     cardTitle: language === 'zh-hk' ? '考試資訊' : 'Examination Information',
@@ -40,12 +36,6 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
     startTimeLabel: language === 'zh-hk' ? '開始時間：' : 'Start Time:',
     endTimeLabel: language === 'zh-hk' ? '結束時間：' : 'End Time:',
     examLanguageLabel: language === 'zh-hk' ? '應考語言：' : 'Exam Language:',
-    textSizeLabel: language === 'zh-hk' ? '字體' : 'Text',
-    decreaseTextSize: language === 'zh-hk' ? '縮小考試資訊字型' : 'Decrease exam info text size',
-    increaseTextSize: language === 'zh-hk' ? '放大考試資訊字型' : 'Increase exam info text size',
-    currentTextSize: language === 'zh-hk'
-      ? '目前考試資訊字型：' + Math.round(textScale * 100) + '%'
-      : 'Current exam info text size: ' + Math.round(textScale * 100) + '%',
     langEn: language === 'zh-hk' ? '英文' : 'English',
     langZhHk: language === 'zh-hk' ? '中文' : 'Chinese',
   };
@@ -76,41 +66,8 @@ export function ExamInfoCard({ examDetails, language }: ExamInfoCardProps) {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          <CardTitle className="text-xl md:text-2xl">{T.cardTitle}</CardTitle>
-          <div className="flex items-center gap-1">
-            <span className="mr-1 text-xs text-muted-foreground">{T.textSizeLabel}</span>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="h-10 w-10"
-              onClick={() => setTextStep(Math.max(0, textStep - 1))}
-              disabled={textStep === 0}
-              aria-label={T.decreaseTextSize}
-              title={T.decreaseTextSize}
-            >
-              <Icons.Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-11 text-center text-xs font-medium tabular-nums text-muted-foreground">
-              {Math.round(textScale * 100)}%
-            </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="h-10 w-10"
-              onClick={() => setTextStep(Math.min(TEXT_SCALES.length - 1, textStep + 1))}
-              disabled={textStep === TEXT_SCALES.length - 1}
-              aria-label={T.increaseTextSize}
-              title={T.increaseTextSize}
-            >
-              <Icons.Plus className="h-4 w-4" />
-            </Button>
-            <span className="sr-only" aria-live="polite">{T.currentTextSize}</span>
-          </div>
-        </div>
+      <CardHeader>
+        <CardTitle className="text-xl md:text-2xl">{T.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
         <ScrollArea className="h-full">

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import type { ExamDetails } from '@/app/page';
+import { EXAM_INFO_TEXT_SCALES } from './exam-info-card';
 import { ScrollArea } from './ui/scroll-area';
 
 // Helper to derive title from subject and paper
@@ -45,6 +46,8 @@ interface ExamSetupModalProps {
   currentDetails: ExamDetails;
   onSave: (details: ExamDetails) => void;
   currentAppLanguage: string;
+  examInfoTextStep: number;
+  onExamInfoTextStepChange: (step: number) => void;
 }
 
 export function ExamSetupModal({
@@ -53,8 +56,11 @@ export function ExamSetupModal({
   currentDetails,
   onSave,
   currentAppLanguage,
+  examInfoTextStep,
+  onExamInfoTextStepChange,
 }: ExamSetupModalProps) {
   const [formState, setFormState] = useState<ExamDetails>(currentDetails);
+  const [textSizeStep, setTextSizeStep] = useState<number>(examInfoTextStep);
 
   useEffect(() => {
     if (isOpen) {
@@ -75,8 +81,9 @@ export function ExamSetupModal({
         durationMinutes: initialDuration,
         examEndTime: initialEndTime,
       });
+      setTextSizeStep(examInfoTextStep);
     }
-  }, [currentDetails, isOpen, currentAppLanguage]);
+  }, [currentDetails, isOpen, currentAppLanguage, examInfoTextStep]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -123,6 +130,7 @@ export function ExamSetupModal({
       finalDetails.title = currentAppLanguage === 'zh-hk' ? '自訂考試' : 'Custom Exam';
     }
     finalDetails.examEndTime = calculateEndTime(finalDetails.examStartTime, finalDetails.durationMinutes);
+    onExamInfoTextStepChange(textSizeStep);
     onSave(finalDetails);
     onClose();
   };
@@ -144,6 +152,9 @@ export function ExamSetupModal({
     languageLabel: currentAppLanguage === 'zh-hk' ? '語言:' : 'Language:',
     langZhHkButton: currentAppLanguage === 'zh-hk' ? '中文' : '中文',
     langEnButton: currentAppLanguage === 'zh-hk' ? 'English' : 'English',
+    displayTitle: currentAppLanguage === 'zh-hk' ? '顯示' : 'Display',
+    examInfoTextSizeLabel: currentAppLanguage === 'zh-hk' ? '考試資訊字型:' : 'Exam Info Text Size:',
+    examInfoTextSizeHint: currentAppLanguage === 'zh-hk' ? '只影響「考試資訊」卡片，不影響計時器。' : 'Affects the "Examination Information" card only, not the timer.',
     cancelButton: currentAppLanguage === 'zh-hk' ? '取消' : 'Cancel',
     confirmAndCloseButton: currentAppLanguage === 'zh-hk' ? '確認並關閉' : 'Confirm & Close',
   };
@@ -235,6 +246,27 @@ export function ExamSetupModal({
                 >
                   {T.langEnButton}
                 </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2 p-3 border rounded-md">
+              <h3 className="text-lg font-semibold text-foreground">{T.displayTitle}</h3>
+              <div>
+                <Label className="text-foreground/90 text-sm">{T.examInfoTextSizeLabel}</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {EXAM_INFO_TEXT_SCALES.map((scale, index) => (
+                    <Button
+                      key={scale}
+                      variant={textSizeStep === index ? 'default' : 'outline'}
+                      onClick={() => setTextSizeStep(index)}
+                      size="sm"
+                      aria-pressed={textSizeStep === index}
+                    >
+                      {Math.round(scale * 100)}%
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">{T.examInfoTextSizeHint}</p>
               </div>
             </div>
           </div>
