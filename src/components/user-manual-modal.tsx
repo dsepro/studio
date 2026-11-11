@@ -35,10 +35,10 @@ export function UserManualModal({ isOpen, onClose, language }: UserManualModalPr
       language === 'zh-hk' ? '<strong>語言切換 (繁/EN 圖示):</strong> 切換顯示語言 (繁體中文（香港）/英文)。' : '<strong>Language Toggle (繁/EN icon):</strong> Toggle display language (Traditional Chinese (Hong Kong)/English).',
       language === 'zh-hk' ? '<strong>全螢幕切換 (展開/收縮圖示):</strong> 進入或退出全螢幕模式。' : '<strong>Fullscreen Toggle (Expand/Shrink icon):</strong> Enter or exit fullscreen mode.',
       language === 'zh-hk' ? '<strong>用戶手冊 (書本圖示):</strong> 開啟此指南。' : '<strong>User Manual (Book icon):</strong> Opens this guide.',
-      // Item for Install App / PWA removed
+      language === 'zh-hk' ? '<strong>隱藏頂部工具列 (↑ 圖示):</strong> 收起整個頂部工具列，讓計時器佔用更大畫面。按頂部中央的 ⌄ 或按鍵盤 H 可還原。' : '<strong>Hide Top Bar (up-chevron icon):</strong> Collapses the whole top bar so the timer gets more room. Tap the ⌄ handle at the top centre or press H to bring it back.',
     ],
     examInfoCardTitle: language === 'zh-hk' ? '考試資訊卡片' : 'Exam Information Card',
-    examInfoCardText: language === 'zh-hk' ? '顯示目前配置的考試詳細資訊，例如考試名稱、中心、科目、試卷、時長等。這些資訊可以透過「考試設定」進行配置。' : 'Displays details about the current configured exam, such as title, centre, subject, paper, duration, etc. These can be configured via "Exam Setup".',
+    examInfoCardText: language === 'zh-hk' ? '顯示目前配置的考試詳細資訊，例如考試名稱、中心、科目、試卷、時長等。這些資訊可以透過「考試設定」進行配置。卡片右上角的「字體 −/+」可獨立放大此卡片的文字（100%–150%），不影響計時器；學生在後排也看得清。' : 'Displays details about the current configured exam, such as title, centre, subject, paper, duration, etc. These can be configured via "Exam Setup". The "Text -/+" control at the top-right of this card enlarges this card\'s text only (100%-150%) without affecting the timer, so students at the back can read it.',
     timerCardTitle: language === 'zh-hk' ? '考試計時器卡片' : 'Exam Timer Card',
     timerCardItems: [
       language === 'zh-hk' ? '<strong>計時器顯示:</strong> 以 HH:MM:SS 格式顯示剩餘時間。剩餘時間少於或等於5分鐘時變為紅色。如果計時器未運行，您可以點擊時間顯示打開編輯彈窗來修改剩餘時間。' : '<strong>Timer Display:</strong> Shows remaining time in HH:MM:SS format. Turns red when 5 minutes or less remain. If the timer is not running, you can click the time display to open an edit modal to modify the time.',

@@ -107,17 +107,20 @@ export default function Home() {
       )}
 
       {isTopBarHidden && (
-        // Touch-first restore handle: always visible while the bar is hidden,
-        // 44px tall so it is comfortably tappable on an iPad.
-        <button
-          type="button"
-          onClick={() => setIsTopBarHidden(false)}
-          aria-label={language === 'zh-hk' ? '顯示頂部工具列' : 'Show top bar'}
-          title={language === 'zh-hk' ? '顯示頂部工具列 (H)' : 'Show top bar (H)'}
-          className="fixed left-1/2 top-0 z-50 flex h-11 w-20 -translate-x-1/2 items-center justify-center rounded-b-2xl border border-t-0 bg-background/70 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-background/95 hover:text-foreground"
-        >
-          <Icons.ChevronDown className="h-5 w-5" />
-        </button>
+        // Touch-first restore handle. It is in normal flow (NOT fixed) and
+        // reserves its own 44px strip, so it can never cover the timer card
+        // at any zoom level or font size.
+        <div className="sticky top-0 z-40 flex h-11 w-full items-stretch justify-center bg-background">
+          <button
+            type="button"
+            onClick={() => setIsTopBarHidden(false)}
+            aria-label={language === 'zh-hk' ? '顯示頂部工具列' : 'Show top bar'}
+            title={language === 'zh-hk' ? '顯示頂部工具列 (H)' : 'Show top bar (H)'}
+            className="flex h-11 w-24 items-center justify-center rounded-b-2xl border border-t-0 bg-card text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <Icons.ChevronDown className="h-5 w-5" />
+          </button>
+        </div>
       )}
 
       <main className="flex-grow flex flex-col container mx-auto max-w-full p-4 md:p-6 lg:p-8 w-full">
