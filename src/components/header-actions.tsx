@@ -15,6 +15,7 @@ interface HeaderActionsProps {
   currentLanguage: string;
   onLanguageChange: (language: string) => void;
   language: string; 
+  onHideTopBar: () => void;
 }
 
 const MIN_FONT_SCALE = 0.8;
@@ -28,7 +29,8 @@ export function HeaderActions({
   onFontScaleChange,
   currentLanguage,
   onLanguageChange,
-  language
+  language,
+  onHideTopBar
 }: HeaderActionsProps) {
   const { setTheme, theme } = useTheme();
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -89,10 +91,11 @@ export function HeaderActions({
     toggleLanguage: currentLanguage === 'zh-hk' ? `切換語言 (目前為 繁)` : `Toggle language (Currently EN)`,
     toggleFullscreen: currentLanguage === 'zh-hk' ? '切換全螢幕' : 'Toggle fullscreen',
     openUserManual: currentLanguage === 'zh-hk' ? '開啟用戶手冊' : 'Open user manual',
+    hideTopBar: currentLanguage === 'zh-hk' ? '隱藏頂部工具列' : 'Hide top bar',
   };
 
   return (
-    <div className="flex items-center space-x-1 md:space-x-2">
+    <div className="flex flex-wrap items-center justify-end gap-1 md:gap-2">
       <Button variant="outline" size="icon" onClick={decreaseFontScale} aria-label={T.decreaseFontSize} disabled={fontScale <= MIN_FONT_SCALE}>
         <Icons.Minus className="h-5 w-5" />
         <span className="sr-only">{T.decreaseFontSize}</span>
@@ -129,6 +132,11 @@ export function HeaderActions({
       </Button>
       
       <MainClock language={language} className="text-sm font-medium" />
+
+      <Button variant="outline" size="icon" onClick={onHideTopBar} aria-label={T.hideTopBar} title={T.hideTopBar}>
+        <Icons.ChevronUp className="h-5 w-5" />
+        <span className="sr-only">{T.hideTopBar}</span>
+      </Button>
     </div>
   );
 }

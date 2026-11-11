@@ -103,9 +103,14 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     font-weight: 400; /* Base font weight */
+    /* Fallback for browsers without dvh support (older iPadOS). */
+    min-height: 100vh;
   }
   html {
     font-size: calc(16px * var(--font-scale-factor));
+    /* Stop iOS/iPadOS from inflating text on its own in landscape. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   /* Custom scrollbar for a more polished look */
   ::-webkit-scrollbar {
@@ -126,5 +131,20 @@
 /* General success button style (can be used if needed, TimerCard now uses primary for Start) */
 .btn-success {
   @apply bg-success text-success-foreground hover:opacity-90;
+}
+
+/*
+ * Countdown digits.
+ * Sized from the viewport so the clock can never overflow its card when the
+ * window is zoomed (browser zoom shrinks the CSS viewport) or when the in-app
+ * font scale is cranked up. The rem term lets the font buttons grow the digits
+ * until they hit the width they actually have available.
+ */
+.timer-digits {
+  font-size: clamp(1.75rem, 12.5vw, calc(9rem * var(--font-scale-factor, 1)));
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 

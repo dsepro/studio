@@ -9,6 +9,7 @@ import { ConfirmationDialog } from '@/components/confirmation-dialog';
 import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
 import useLocalStorage from '@/hooks/use-local-storage';
+import { Icons } from '@/components/icons';
 
 
 export interface ExamDetails {
@@ -43,6 +44,8 @@ export default function Home() {
 
   const [isUserManualOpen, setIsUserManualOpen] = useState(false);
   const [isExamSetupOpen, setIsExamSetupOpen] = useState(false);
+  // Deliberately not persisted: a reload always brings the top bar back.
+  const [isTopBarHidden, setIsTopBarHidden] = useState(false);
 
   const [confirmationState, setConfirmationState] = useState<{
     isOpen: boolean;
@@ -54,6 +57,20 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.style.setProperty('--font-scale-factor', fontScale.toString());
   }, [fontScale]);
+
+  // Keyboard shortcut for desktop: "h" toggles the top bar.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      if (target?.isContentEditable) return;
+      if (event.key.toLowerCase() !== 'h') return;
+      setIsTopBarHidden(previous => !previous);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const handleOpenConfirmation = useCallback((title: string, description: string, onConfirm: () => void) => {
     setConfirmationState({ isOpen: true, title, description, onConfirm });
@@ -67,24 +84,41 @@ export default function Home() {
   const appTitle = language === 'zh-hk' ? '考試資訊' : 'Examination Information';
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
-          <div className="flex items-center justify-end h-16">
-            <div className="flex items-center space-x-1 md:space-x-2">
-               <HeaderActions
-                onOpenUserManual={() => setIsUserManualOpen(true)}
-                onOpenExamSetup={() => setIsExamSetupOpen(true)}
-                fontScale={fontScale}
-                onFontScaleChange={setFontScale}
-                currentLanguage={language}
-                onLanguageChange={setLanguage}
-                language={language}
-              />
+    <div className="relative flex flex-col min-h-[100dvh] bg-background text-foreground transition-colors duration-300">
+      {!isTopBarHidden && (
+        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
+            <div className="flex min-h-16 flex-wrap items-center justify-end gap-y-1 py-1">
+              <div className="flex w-full flex-wrap items-center justify-end gap-1 md:gap-2">
+                <HeaderActions
+                  onOpenUserManual={() => setIsUserManualOpen(true)}
+                  onOpenExamSetup={() => setIsExamSetupOpen(true)}
+                  fontScale={fontScale}
+                  onFontScaleChange={setFontScale}
+                  currentLanguage={language}
+                  onLanguageChange={setLanguage}
+                  language={language}
+                  onHideTopBar={() => setIsTopBarHidden(true)}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
+
+      {isTopBarHidden && (
+        // Touch-first restore handle: always visible while the bar is hidden,
+        // 44px tall so it is comfortably tappable on an iPad.
+        <button
+          type="button"
+          onClick={() => setIsTopBarHidden(false)}
+          aria-label={language === 'zh-hk' ? '顯示頂部工具列' : 'Show top bar'}
+          title={language === 'zh-hk' ? '顯示頂部工具列 (H)' : 'Show top bar (H)'}
+          className="fixed left-1/2 top-0 z-50 flex h-11 w-20 -translate-x-1/2 items-center justify-center rounded-b-2xl border border-t-0 bg-background/70 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-background/95 hover:text-foreground"
+        >
+          <Icons.ChevronDown className="h-5 w-5" />
+        </button>
+      )}
 
       <main className="flex-grow flex flex-col container mx-auto max-w-full p-4 md:p-6 lg:p-8 w-full">
         <div className="flex flex-col gap-6 flex-grow">
