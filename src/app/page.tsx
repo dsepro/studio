@@ -10,6 +10,7 @@ import { UserManualModal } from '@/components/user-manual-modal';
 import { ExamSetupModal } from '@/components/exam-setup-modal';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 
 
 export interface ExamDetails {
@@ -109,20 +110,20 @@ export default function Home() {
       )}
 
       {isTopBarHidden && (
-        // Touch-first restore handle. It is in normal flow (NOT fixed) and
-        // reserves its own 44px strip, so it can never cover the timer card
-        // at any zoom level or font size.
-        <div className="sticky top-0 z-40 flex h-11 w-full items-stretch justify-center bg-background">
-          <button
-            type="button"
-            onClick={() => setIsTopBarHidden(false)}
-            aria-label={language === 'zh-hk' ? '顯示頂部工具列' : 'Show top bar'}
-            title={language === 'zh-hk' ? '顯示頂部工具列 (H)' : 'Show top bar (H)'}
-            className="flex h-11 w-24 items-center justify-center rounded-b-2xl border border-t-0 bg-card text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-foreground"
-          >
-            <Icons.ChevronDown className="h-5 w-5" />
-          </button>
-        </div>
+        // Same chevron affordance as the header button, pinned where the
+        // header's last icon used to sit. It floats over the card's empty
+        // top-right corner instead of reserving a strip, so hiding the bar
+        // gives the timer the full height back.
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setIsTopBarHidden(false)}
+          aria-label={language === 'zh-hk' ? '顯示頂部工具列' : 'Show top bar'}
+          title={language === 'zh-hk' ? '顯示頂部工具列 (H)' : 'Show top bar (H)'}
+          className="fixed right-3 top-3 z-50 h-[44px] w-[44px] rounded-lg border bg-background/70 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <Icons.ChevronDown className="h-5 w-5" />
+        </Button>
       )}
 
       <main className="flex-grow flex flex-col container mx-auto max-w-full p-4 md:p-6 lg:p-8 w-full">
